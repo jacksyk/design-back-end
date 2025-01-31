@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User, Activity } from 'entities';
+import { User, Activity, UserActivity } from 'entities';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginModule } from './login/login.module';
 import { RedisModule } from './redis/redis.module';
@@ -20,7 +20,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       username: 'root',
       password: 'kang',
       database: 'mysql',
-      entities: [User, Activity],
+      entities: [User, Activity, UserActivity],
       synchronize: true,
     }),
     JwtModule.register({

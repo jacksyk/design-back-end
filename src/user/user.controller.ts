@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -40,5 +41,23 @@ export class UserController {
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const data = await this.findOne(id);
     return this.userService.update(+id, Object.assign(data, updateUserDto));
+  }
+
+  @Get('likes/:id')
+  @UseGuards(LoginGuard)
+  likes(@Param('id') id: string, @Req() req: Request) {
+    return this.userService.likes(+id, req);
+  }
+
+  @Get('collections/:id')
+  @UseGuards(LoginGuard)
+  collections(@Param('id') id: string, @Req() req: Request) {
+    return this.userService.collections(+id, req);
+  }
+
+  @Get('views/:id')
+  @UseGuards(LoginGuard)
+  views(@Param('id') id: string) {
+    return this.userService.views(+id);
   }
 }

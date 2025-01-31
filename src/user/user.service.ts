@@ -1,14 +1,28 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Req } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { User } from 'entities';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RedisClientType } from 'redis';
+import { ActivityService } from 'src/activity/activity.service';
 @Injectable()
 export class UserService {
   // 注入实体管理器
   @InjectEntityManager()
   private manager: EntityManager;
+
+  @Inject('REDIS_CLIENT')
+  private redisClient: RedisClientType;
+
+  @Inject(ActivityService)
+  private activityService: ActivityService;
+
+  private prefix: string;
+
+  constructor() {
+    this.prefix = 'users';
+  }
 
   async findAll() {
     const [data, count] = await this.manager.findAndCount(User);
@@ -49,7 +63,78 @@ export class UserService {
     return this.manager.update(User, id, updateUserDto);
   }
 
+  /** 删除用户 */
   remove(id: number) {
     return this.manager.delete(User, id);
+  }
+
+  async likes(activity_id: number, @Req() req: Request) {
+    const user_id = req['user_id'];
+    const key = `${this.prefix}:${user_id}:${activity_id}`;
+
+    let isLike = await this.redisClient.hGet(key, 'likes'); // 0 未点赞 1 已点赞
+
+    console.log('isLike', isLike);
+
+    if (isLike === null) {
+      await this.redisClient.hSet(key, 'likes', '0');
+    }
+
+    isLike = await this.redisClient.hGet(key, 'likes');
+
+    if (isLike === '0') {
+      await this.redisClient.hSet(key, 'likes', '1');
+      await this.activityService.likes(activity_id);
+      return {
+        data: '1',
+        message: '点赞成功',
+      };
+    }
+
+    await this.redisClient.hSet(key, 'likes', '0');
+    await this.activityService.cancelLikes(activity_id);
+    return {
+      data: '0',
+      message: '取消点赞',
+    };
+  }
+
+  async collections(activity_id: number, @Req() req: Request) {
+    const user_id = req['user_id'];
+    const key = `${this.prefix}:${user_id}:${activity_id}`;
+
+    let isCollection = await this.redisClient.hGet(key, 'collections');
+
+    console.log('isCollection', isCollection);
+    if (isCollection === null) {
+      await this.redisClient.hSet(key, 'collections', '0');
+    }
+
+    isCollection = await this.redisClient.hGet(key, 'collections');
+
+    if (isCollection === '0') {
+      await this.redisClient.hSet(key, 'collections', '1');
+      await this.activityService.collections(activity_id);
+      return {
+        data: '1',
+        message: '收藏成功',
+      };
+    }
+
+    await this.redisClient.hSet(key, 'collections', '0');
+    await this.activityService.cancelCollections(activity_id);
+    return {
+      data: '0',
+      message: '取消收藏',
+    };
+  }
+
+  async views(activity_id: number) {
+    await this.activityService.views(activity_id);
+
+    return {
+      data: '1',
+      message: '浏览成功',
+    };
   }
 }

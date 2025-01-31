@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Activity } from './activity.entity';
+import { UserActivity } from './user-activity.entity';
 
 @Entity({
   // 表名
@@ -56,4 +57,8 @@ export class User {
   /** 一对多 */
   @OneToMany(() => Activity, (activity) => activity.user)
   activities: Activity[];
+
+  /** 用户和活动关联 */
+  @OneToMany(() => UserActivity, (userActivity) => userActivity.user)
+  userActivities: UserActivity[];
 }

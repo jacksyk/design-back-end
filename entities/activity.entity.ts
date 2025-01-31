@@ -4,8 +4,10 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { UserActivity } from './user-activity.entity';
 
 @Entity({
   name: 'activity',
@@ -98,4 +100,7 @@ export class Activity {
     default: 0,
   })
   collections: number;
+
+  @OneToMany(() => UserActivity, (userActivity) => userActivity.activity)
+  userActivities: UserActivity[];
 }

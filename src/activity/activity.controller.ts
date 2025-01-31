@@ -51,19 +51,4 @@ export class ActivityController {
   remove(@Param('id') id: string) {
     return this.activityService.remove(+id);
   }
-
-  @Get('likes/:id')
-  likes(@Param('id') id: string) {
-    return this.activityService.likes(+id);
-  }
-
-  @Get('views/:id')
-  views(@Param('id') id: string) {
-    return this.activityService.views(+id);
-  }
-
-  @Get('collections/:id')
-  collections(@Param('id') id: string) {
-    return this.activityService.collections(+id);
-  }
 }

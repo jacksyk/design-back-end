@@ -6,5 +6,6 @@ import { ActivityController } from './activity.controller';
   imports: [],
   controllers: [ActivityController],
   providers: [ActivityService],
+  exports: [ActivityService],
 })
 export class ActivityModule {}
