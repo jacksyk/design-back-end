@@ -1,7 +1,16 @@
-import { Controller, Get, Body, Patch, Param, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { LoginGuard } from 'common/guard/login.guard';
 
 @Controller('user')
 export class UserController {
@@ -9,6 +18,7 @@ export class UserController {
 
   /** 获取所有用户信息 */
   @Get()
+  @UseGuards(LoginGuard)
   findAll() {
     return this.userService.findAll();
   }

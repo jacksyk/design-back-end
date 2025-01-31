@@ -4,6 +4,9 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
+import { JwtModule } from '@nestjs/jwt';
+import { LoginModule } from './login/login.module';
+import { RedisModule } from './redis/redis.module';
 @Module({
   imports: [
     UserModule,
@@ -17,6 +20,15 @@ import { User } from './user/entities/user.entity';
       entities: [User],
       synchronize: true,
     }),
+    JwtModule.register({
+      global: true,
+      secret: 'kang',
+      signOptions: {
+        expiresIn: '1s',
+      },
+    }),
+    LoginModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

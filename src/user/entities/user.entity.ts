@@ -41,4 +41,14 @@ export class User {
     nullable: true,
   })
   email: string;
+
+  /** 用户权限 */
+  @Column({
+    name: 'role',
+    length: 20,
+    comment: '用户权限',
+    nullable: true,
+    default: 'user',
+  })
+  role: string;
 }

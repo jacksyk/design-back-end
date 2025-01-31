@@ -4,7 +4,6 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-
 @Injectable()
 export class UserService {
   // 注入实体管理器

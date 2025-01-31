@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateUserDto {
+export class LoginDto {
   @IsNotEmpty()
   /** 学号 */
   student_id: string;
