@@ -42,6 +42,8 @@ export class LoginGuard implements CanActivate {
         throw new UnauthorizedException('用户信息已过期,请重新登录');
       }
 
+      request['user_id'] = id;
+
       return true;
     } catch {
       await this.redisClient.del(id.toString());

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Activity } from './activity.entity';
 
 @Entity({
   // 表名
@@ -51,4 +52,8 @@ export class User {
     default: 'user',
   })
   role: string;
+
+  /** 一对多 */
+  @OneToMany(() => Activity, (activity) => activity.user)
+  activities: Activity[];
 }
