@@ -3,13 +3,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User, Activity, UserActivity } from 'entities';
+import { User, Activity, UserActivity, Comment } from 'entities';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginModule } from './login/login.module';
 import { RedisModule } from './redis/redis.module';
 import { ActivityModule } from './activity/activity.module';
 import { TaskModule } from './task/task.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CommentModule } from './comment/comment.module';
 @Module({
   imports: [
     UserModule,
@@ -20,7 +21,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       username: 'root',
       password: 'kang',
       database: 'mysql',
-      entities: [User, Activity, UserActivity],
+      entities: [User, Activity, UserActivity, Comment],
       synchronize: true,
     }),
     JwtModule.register({
@@ -35,6 +36,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ActivityModule,
     TaskModule,
     ScheduleModule.forRoot(),
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

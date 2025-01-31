@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Activity } from './activity.entity';
 import { UserActivity } from './user-activity.entity';
-
+import { Comment } from './comment.entity';
 @Entity({
   // 表名
   name: 'users',
@@ -61,4 +61,7 @@ export class User {
   /** 用户和活动关联 */
   @OneToMany(() => UserActivity, (userActivity) => userActivity.user)
   userActivities: UserActivity[];
+
+  @OneToMany(() => Comment, (comment) => comment.userId)
+  comments: Comment[];
 }

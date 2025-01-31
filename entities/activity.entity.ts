@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserActivity } from './user-activity.entity';
+import { Comment } from './comment.entity';
 
 @Entity({
   name: 'activity',
@@ -103,4 +104,7 @@ export class Activity {
 
   @OneToMany(() => UserActivity, (userActivity) => userActivity.activity)
   userActivities: UserActivity[];
+
+  @OneToMany(() => Comment, (comment) => comment.activityId)
+  comments: Comment[];
 }
