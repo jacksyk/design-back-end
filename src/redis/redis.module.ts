@@ -11,7 +11,10 @@ import { createClient } from 'redis';
       async useFactory() {
         const client = createClient({
           socket: {
-            host: 'localhost',
+            // host: 'localhost', // 开发环境
+            // host: 'redis', // 生产环境
+
+            host: process.env.NODE_ENV === 'production' ? 'redis' : 'localhost',
             port: 6379,
           },
         });

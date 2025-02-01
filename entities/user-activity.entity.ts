@@ -16,14 +16,18 @@ export class UserActivity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.userActivities)
+  @ManyToOne(() => User, (user) => user.userActivities, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({
     name: 'user_id',
     referencedColumnName: 'id',
   })
   user: User;
 
-  @ManyToOne(() => Activity, (activity) => activity.userActivities)
+  @ManyToOne(() => Activity, (activity) => activity.userActivities, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({
     name: 'activity_id',
     referencedColumnName: 'id',

@@ -17,12 +17,12 @@ import { UploadModule } from './upload/upload.module';
     UserModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: process.env.NODE_ENV === 'production' ? 'db' : 'localhost',
       port: 3306,
       username: 'root',
       password: 'kang',
       database: 'mysql',
-      entities: [User, Activity, UserActivity, Comment],
+      entities: [User, Activity, Comment, UserActivity],
       synchronize: true,
     }),
     JwtModule.register({

@@ -1,4 +1,10 @@
-import { BadRequestException, Inject, Injectable, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  Req,
+} from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
@@ -69,12 +75,19 @@ export class UserService {
   }
 
   async likes(activity_id: number, @Req() req: Request) {
+    // 先检查活动是否存在
+    const activity = await this.manager.findOne(User, {
+      where: { id: activity_id },
+    });
+
+    if (!activity) {
+      throw new NotFoundException('活动不存在');
+    }
+
     const user_id = req['user_id'];
     const key = `${this.prefix}:${user_id}:${activity_id}`;
 
     let isLike = await this.redisClient.hGet(key, 'likes'); // 0 未点赞 1 已点赞
-
-    console.log('isLike', isLike);
 
     if (isLike === null) {
       await this.redisClient.hSet(key, 'likes', '0');
@@ -100,12 +113,20 @@ export class UserService {
   }
 
   async collections(activity_id: number, @Req() req: Request) {
+    // 先检查活动是否存在
+    const activity = await this.manager.findOne(User, {
+      where: { id: activity_id },
+    });
+
+    if (!activity) {
+      throw new NotFoundException('活动不存在');
+    }
+
     const user_id = req['user_id'];
     const key = `${this.prefix}:${user_id}:${activity_id}`;
 
     let isCollection = await this.redisClient.hGet(key, 'collections');
 
-    console.log('isCollection', isCollection);
     if (isCollection === null) {
       await this.redisClient.hSet(key, 'collections', '0');
     }
@@ -130,6 +151,15 @@ export class UserService {
   }
 
   async views(activity_id: number) {
+    // 先检查活动是否存在
+    const activity = await this.manager.findOne(User, {
+      where: { id: activity_id },
+    });
+
+    if (!activity) {
+      throw new NotFoundException('活动不存在');
+    }
+
     await this.activityService.views(activity_id);
 
     return {

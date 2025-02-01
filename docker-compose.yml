@@ -1,0 +1,47 @@
+services:
+  app:
+    build: .
+    container_name: graduation_app
+    restart: always
+    environment:
+      - NODE_ENV=production
+    ports:
+      - '3000:3000'
+    networks:
+      - app_network
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: mysql:8.0
+    container_name: graduation_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: kang
+      MYSQL_DATABASE: mysql
+    ports:
+      - '3306:3306'
+    volumes:
+      - /www/wwwroot/mysql-data:/var/lib/mysql
+    networks:
+      - app_network
+
+  redis:
+    image: redis:8.0-M02
+    container_name: graduation_redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  app_network:
+    driver: bridge

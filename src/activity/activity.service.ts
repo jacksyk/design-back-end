@@ -1,4 +1,10 @@
-import { Inject, Injectable, Query, Req } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { CreateActivityDto, GetQueryDto } from './dto';
@@ -47,6 +53,11 @@ export class ActivityService {
       where: { id },
       relations: ['user'],
     });
+
+    if (!activity) {
+      return new NotFoundException('活动未找到');
+    }
+
     return activity;
   }
 
