@@ -11,6 +11,7 @@ import { ActivityModule } from './activity/activity.module';
 import { TaskModule } from './task/task.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CommentModule } from './comment/comment.module';
+import { UploadModule } from './upload/upload.module';
 @Module({
   imports: [
     UserModule,
@@ -37,6 +38,7 @@ import { CommentModule } from './comment/comment.module';
     TaskModule,
     ScheduleModule.forRoot(),
     CommentModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

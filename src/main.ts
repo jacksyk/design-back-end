@@ -3,9 +3,15 @@ import { AppModule } from './app.module';
 import { info } from 'node:console';
 import { TransformInterceptor } from 'common/interceptor/response.interceptor';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useGlobalInterceptors(new TransformInterceptor());
+  // 配置静态资源目录
+  app.useStaticAssets('public', {
+    prefix: '/static',
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
