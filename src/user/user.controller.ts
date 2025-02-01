@@ -17,9 +17,17 @@ import { LoginGuard } from 'common/guard/login.guard';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  /** 获取所有用户信息 */
-  @Get()
   @UseGuards(LoginGuard)
+  /** 获取单个用户信息 */
+  @Get()
+  findOne(@Req() request: Request) {
+    const userId = request['user_id'];
+    return this.userService.findOne(+userId);
+  }
+
+  @UseGuards(LoginGuard)
+  /** 获取所有用户信息 */
+  @Get('/all')
   findAll() {
     return this.userService.findAll();
   }
@@ -30,17 +38,13 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  /** 获取单个用户信息 */
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
   /** 更新某个用户信息 */
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    const data = await this.findOne(id);
-    return this.userService.update(+id, Object.assign(data, updateUserDto));
+  @UseGuards(LoginGuard)
+  @Patch()
+  async update(@Body() updateUserDto: UpdateUserDto, @Req() request: Request) {
+    const data = await this.findOne(request);
+    const userId = request['user_id'];
+    return this.userService.update(+userId, Object.assign(data, updateUserDto));
   }
 
   @Get('likes/:id')

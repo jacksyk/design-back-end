@@ -26,8 +26,6 @@ export class ActivityController {
   ) {
     const user_id = request['user_id'];
 
-    console.log('user_id', user_id);
-
     Object.assign(createActivityDto, {
       start_time: new Date(createActivityDto.start_time),
       end_time: new Date(createActivityDto.end_time),
@@ -40,6 +38,14 @@ export class ActivityController {
   @Get()
   findAll(@Query() query: GetQueryDto) {
     return this.activityService.findAll(query);
+  }
+
+  /** 查询某个用户的活动记录 */
+  @UseGuards(LoginGuard)
+  @Get('user')
+  findByUserId(@Req() request: Request) {
+    // return 'hello';
+    return this.activityService.findByUserId(request);
   }
 
   @Get(':id')

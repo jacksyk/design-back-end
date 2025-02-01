@@ -1,4 +1,4 @@
-import { Inject, Injectable, Query } from '@nestjs/common';
+import { Inject, Injectable, Query, Req } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { CreateActivityDto, GetQueryDto } from './dto';
@@ -134,5 +134,22 @@ export class ActivityService {
     }
     await this.redisClient.hSet(key, 'collections', '0');
     return;
+  }
+
+  async findByUserId(@Req() request: Request) {
+    console.log('>>>', request['user_id']);
+    const userId = request['user_id'];
+    const activity = await this.manager.find(Activity, {
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+      relations: ['user'],
+    });
+
+    console.log('activity', activity);
+
+    return activity;
   }
 }
