@@ -12,12 +12,11 @@ import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginGuard } from 'common/guard/login.guard';
-
+@UseGuards(LoginGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @UseGuards(LoginGuard)
   /** 获取单个用户信息 */
   @Get()
   findOne(@Req() request: Request) {
@@ -25,7 +24,6 @@ export class UserController {
     return this.userService.findOne(+userId);
   }
 
-  @UseGuards(LoginGuard)
   /** 获取所有用户信息 */
   @Get('/all')
   findAll() {
@@ -39,7 +37,6 @@ export class UserController {
   }
 
   /** 更新某个用户信息 */
-  @UseGuards(LoginGuard)
   @Patch()
   async update(@Body() updateUserDto: UpdateUserDto, @Req() request: Request) {
     const data = await this.findOne(request);
@@ -48,19 +45,16 @@ export class UserController {
   }
 
   @Get('likes/:id')
-  @UseGuards(LoginGuard)
   likes(@Param('id') id: string, @Req() req: Request) {
     return this.userService.likes(+id, req);
   }
 
   @Get('collections/:id')
-  @UseGuards(LoginGuard)
   collections(@Param('id') id: string, @Req() req: Request) {
     return this.userService.collections(+id, req);
   }
 
   @Get('views/:id')
-  @UseGuards(LoginGuard)
   views(@Param('id') id: string) {
     return this.userService.views(+id);
   }
