@@ -5,6 +5,8 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
+    volumes:
+      - /www/wwwroot/app-data:/app
     ports:
       - '3000:3000'
     networks:

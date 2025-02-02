@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import OpenAI from 'openai';
 import { ChatCompletionChunk, SSE } from './sse.types';
@@ -10,40 +10,50 @@ const openai = new OpenAI({
   baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
 });
 
-const handleChunk = (chunk: ChatCompletionChunk, count: number) => {
-  const data = {
-    content: chunk.choices[0].delta.content,
-    role: 'assistant',
-  };
-
-  if (count === 0) {
-    return {
-      data,
-      flag: 'start',
-    };
-  }
-
-  if (chunk.choices[0].finish_reason === 'stop') {
-    return {
-      data,
-      flag: 'end',
-    };
-  }
-
-  return {
-    data,
-    flag: 'streaming',
-  };
-};
-
 @Controller('sse')
 export class SseController {
+  @Get()
+  getSse() {
+    return '请用post方法>>>';
+  }
+
   @Post()
   async sse(@Body() sse: SSE, @Res() res: Response) {
+    console.log('sse', sse);
     // 处理 SSE 请求
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+
+    const bufferContent: string[] = [];
+
+    const handleChunk = (chunk: ChatCompletionChunk, count: number) => {
+      bufferContent.push(chunk.choices[0].delta.content);
+
+      const data = {
+        content: bufferContent.join(''),
+        role: 'assistant',
+      };
+
+      if (count === 0) {
+        return {
+          data,
+          flag: 'start',
+        };
+      }
+
+      if (chunk.choices[0].finish_reason === 'stop') {
+        return {
+          data,
+          flag: 'end',
+        };
+      }
+
+      return {
+        data,
+        flag: 'streaming',
+      };
+    };
 
     const completion = await openai.chat.completions.create({
       model: 'qwen-plus',

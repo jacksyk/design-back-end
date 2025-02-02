@@ -6,6 +6,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.enableCors();
+
   app.useGlobalInterceptors(new TransformInterceptor());
   // 配置静态资源目录
   app.useStaticAssets('public', {
