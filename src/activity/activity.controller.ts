@@ -10,7 +10,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ActivityService } from './activity.service';
-import { CreateActivityDto } from './dto/create-activity.dto';
+import { SearchActivityDto, CreateActivityDto } from './dto';
 import { LoginGuard } from 'common/guard/login.guard';
 import { GetQueryDto } from './dto';
 
@@ -56,5 +56,10 @@ export class ActivityController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.activityService.remove(+id);
+  }
+
+  @Post('/search')
+  search(@Body() searchActivityDto: SearchActivityDto) {
+    return this.activityService.search(searchActivityDto);
   }
 }

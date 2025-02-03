@@ -1,4 +1,5 @@
 import {
+  Body,
   Inject,
   Injectable,
   NotFoundException,
@@ -6,8 +7,8 @@ import {
   Req,
 } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
-import { CreateActivityDto, GetQueryDto } from './dto';
+import { EntityManager, Like } from 'typeorm';
+import { CreateActivityDto, GetQueryDto, SearchActivityDto } from './dto';
 import { Activity, Comment } from 'entities';
 import { RedisClientType } from 'redis';
 
@@ -177,5 +178,21 @@ export class ActivityService {
     console.log('activity', activity);
 
     return activity;
+  }
+
+  async search(@Body() searchActivityDto: SearchActivityDto) {
+    const { searchContent } = searchActivityDto;
+    const data = await this.manager.find(Activity, {
+      where: [
+        {
+          title: Like(`%${searchContent}%`),
+        },
+        {
+          description: Like(`%${searchContent}%`),
+        },
+      ],
+    });
+
+    return data;
   }
 }
