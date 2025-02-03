@@ -12,4 +12,7 @@ export class UpdateUserDto {
   })
   @IsOptional()
   email?: string;
+
+  @IsOptional()
+  avatar?: string;
 }

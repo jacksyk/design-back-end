@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Activity } from './activity.entity';
 import { UserActivity } from './user-activity.entity';
 import { Comment } from './comment.entity';
+import { FeedBack } from './feedback.entity';
 @Entity({
   // 表名
   name: 'users',
@@ -71,6 +72,11 @@ export class User {
   @OneToMany(() => UserActivity, (userActivity) => userActivity.user)
   userActivities: UserActivity[];
 
+  /** 用户和评论 */
   @OneToMany(() => Comment, (comment) => comment.userId)
   comments: Comment[];
+
+  /** 用户建议 */
+  @OneToMany(() => FeedBack, (feedback) => feedback.user)
+  feedback: FeedBack[];
 }

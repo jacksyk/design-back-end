@@ -3,7 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User, Activity, UserActivity, Comment } from 'entities';
+import {
+  User,
+  Activity,
+  UserActivity,
+  Comment,
+  FeedBack,
+  Resource,
+  ResourceClassify,
+} from 'entities';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginModule } from './login/login.module';
 import { RedisModule } from './redis/redis.module';
@@ -13,6 +21,10 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CommentModule } from './comment/comment.module';
 import { UploadModule } from './upload/upload.module';
 import { SseModule } from './sse/sse.module';
+import { FeedbackModule } from './feedback/feedback.module';
+import { ResourceModule } from './resource/resource.module';
+import { ResourceClassifyModule } from './resource-classify/resource-classify.module';
+
 @Module({
   imports: [
     UserModule,
@@ -23,7 +35,15 @@ import { SseModule } from './sse/sse.module';
       username: 'root',
       password: 'kang',
       database: 'mysql',
-      entities: [User, Activity, Comment, UserActivity],
+      entities: [
+        User,
+        Activity,
+        Comment,
+        UserActivity,
+        FeedBack,
+        Resource,
+        ResourceClassify,
+      ],
       synchronize: true,
     }),
     JwtModule.register({
@@ -41,6 +61,9 @@ import { SseModule } from './sse/sse.module';
     CommentModule,
     UploadModule,
     SseModule,
+    FeedbackModule,
+    ResourceModule,
+    ResourceClassifyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
