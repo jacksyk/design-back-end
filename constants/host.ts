@@ -1,1 +1,1 @@
-export const host = 'http://localhost:3000';
+export const host = 'http://4747.122.119.171:3000';

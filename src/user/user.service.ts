@@ -8,7 +8,7 @@ import {
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
-import { User } from 'entities';
+import { Activity, User } from 'entities';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RedisClientType } from 'redis';
 import { ActivityService } from 'src/activity/activity.service';
@@ -66,8 +66,22 @@ export class UserService {
     return data;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.manager.update(User, id, updateUserDto);
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const originData = await this.manager.findOne(User, {
+      where: { id },
+    });
+
+    if (!originData) {
+      throw new NotFoundException('用户不存在');
+    }
+
+    await this.manager.update(
+      User,
+      id,
+      Object.assign(originData, updateUserDto),
+    );
+
+    return '更新成功';
   }
 
   /** 删除用户 */
@@ -77,7 +91,7 @@ export class UserService {
 
   async likes(activity_id: number, @Req() req: Request) {
     // 先检查活动是否存在
-    const activity = await this.manager.findOne(User, {
+    const activity = await this.manager.findOne(Activity, {
       where: { id: activity_id },
     });
 
@@ -115,7 +129,7 @@ export class UserService {
 
   async collections(activity_id: number, @Req() req: Request) {
     // 先检查活动是否存在
-    const activity = await this.manager.findOne(User, {
+    const activity = await this.manager.findOne(Activity, {
       where: { id: activity_id },
     });
 
@@ -153,7 +167,7 @@ export class UserService {
 
   async views(activity_id: number) {
     // 先检查活动是否存在
-    const activity = await this.manager.findOne(User, {
+    const activity = await this.manager.findOne(Activity, {
       where: { id: activity_id },
     });
 

@@ -41,9 +41,8 @@ export class UserController {
   /** 更新某个用户信息 */
   @Patch()
   async update(@Body() updateUserDto: UpdateUserDto, @Req() request: Request) {
-    const data = await this.findOne(request);
     const userId = request['user_id'];
-    return this.userService.update(+userId, Object.assign(data, updateUserDto));
+    return this.userService.update(+userId, updateUserDto);
   }
 
   @Get('likes/:id')

@@ -8,7 +8,7 @@ import {
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { CreateActivityDto, GetQueryDto } from './dto';
-import { Activity } from 'entities';
+import { Activity, Comment } from 'entities';
 import { RedisClientType } from 'redis';
 
 @Injectable()
@@ -62,7 +62,22 @@ export class ActivityService {
   }
 
   async remove(id: number) {
-    await this.manager.delete(Activity, id);
+    // 再删除活动
+    const activity = await this.manager.findOne(Activity, {
+      where: { id },
+    });
+
+    if (!activity) {
+      throw new NotFoundException('活动未找到');
+    }
+
+    // 开启事务
+    await this.manager.transaction(async (transactionalEntityManager) => {
+      // 先删除关联的评论
+      await transactionalEntityManager.delete(Comment, { activityId: id });
+      await transactionalEntityManager.remove(Activity, activity);
+    });
+
     return {
       message: '删除成功',
     };
