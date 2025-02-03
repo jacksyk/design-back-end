@@ -54,6 +54,15 @@ export class User {
   })
   role: string;
 
+  /** 用户头像 */
+  @Column({
+    name: 'avatar',
+    length: 255,
+    comment: '用户头像URL',
+    nullable: true,
+  })
+  avatar: string;
+
   /** 一对多 */
   @OneToMany(() => Activity, (activity) => activity.user)
   activities: Activity[];
