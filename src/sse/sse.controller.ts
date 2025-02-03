@@ -27,7 +27,7 @@ export class SseController {
 
     const bufferContent: string[] = [];
 
-    const handleChunk = (chunk: ChatCompletionChunk, count: number) => {
+    const handleChunk = (chunk: ChatCompletionChunk) => {
       bufferContent.push(chunk.choices[0].delta.content);
 
       const data = {
@@ -35,23 +35,8 @@ export class SseController {
         role: 'assistant',
       };
 
-      if (count === 0) {
-        return {
-          data,
-          flag: 'start',
-        };
-      }
-
-      if (chunk.choices[0].finish_reason === 'stop') {
-        return {
-          data,
-          flag: 'end',
-        };
-      }
-
       return {
         data,
-        flag: 'streaming',
       };
     };
 
@@ -70,7 +55,7 @@ export class SseController {
     for await (const chunk of completion) {
       // @ts-ignore
       const handledChunk = handleChunk(chunk, count);
-      res.write(`data: ${JSON.stringify(handledChunk)}\n\n`);
+      res.write(`messageType:line\ndata: ${JSON.stringify(handledChunk)}\n\n`);
       count++;
     }
     res.end();
