@@ -54,9 +54,10 @@ export class UserService {
   }
 
   async findOne(id: number) {
-    const data = await this.manager.findOne(User, { where: { id } });
-
-    console.log(data);
+    const data = await this.manager.findOne(User, {
+      where: { id },
+      relations: ['activities', 'comments', 'feedback'],
+    });
 
     if (!data) {
       throw new BadRequestException('用户不存在');
