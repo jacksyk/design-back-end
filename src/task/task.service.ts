@@ -74,6 +74,7 @@ export class TaskService {
                   userActivity.id,
                   {
                     isLiked: +likes,
+                    isCollected: +collections, // 添加 isCollected 的更新
                   },
                 );
                 continue;
