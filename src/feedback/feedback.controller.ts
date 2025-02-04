@@ -36,4 +36,9 @@ export class FeedbackController {
   remove(@Param('feedbackId') id: string) {
     return this.feedbackService.remove(+id);
   }
+
+  @Get('/reply')
+  getReplyFeedback(@Req() request: Request) {
+    return this.feedbackService.reply(request);
+  }
 }

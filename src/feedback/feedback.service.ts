@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, Req } from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
+import { EntityManager, IsNull, Not } from 'typeorm';
 import { FeedBack } from 'entities';
 
 @Injectable()
@@ -50,5 +50,20 @@ export class FeedbackService {
 
     await this.manager.remove(FeedBack, feedback);
     return '删除成功';
+  }
+
+  async reply(@Req() req: Request) {
+    const userId = req['user_id'];
+    const [data, totalCount] = await this.manager.findAndCount(FeedBack, {
+      where: {
+        userId,
+        reply: Not(IsNull()),
+      },
+    });
+
+    return {
+      data,
+      totalCount,
+    };
   }
 }
