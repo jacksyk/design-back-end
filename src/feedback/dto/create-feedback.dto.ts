@@ -6,4 +6,10 @@ export class CreateFeedbackDto {
   })
   @IsString()
   content: string; // 反馈的内容
+
+  @IsNotEmpty({
+    message: '请输入需要反馈的标题',
+  })
+  @IsString()
+  title: string;
 }

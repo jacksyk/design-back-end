@@ -16,7 +16,9 @@ export class CommentService {
     const comment = await this.manager.save(Comment, {
       content,
       userId,
-      activityId,
+      activityId: {
+        id: activityId,
+      },
     });
 
     return {
@@ -32,7 +34,9 @@ export class CommentService {
   findOne(articleId: number) {
     return this.manager.find(Comment, {
       where: {
-        activityId: articleId,
+        activityId: {
+          id: articleId,
+        },
       },
       relations: ['userId'],
       order: {

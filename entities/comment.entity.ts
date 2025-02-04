@@ -22,7 +22,7 @@ export class Comment {
     name: 'user_id',
     referencedColumnName: 'id',
   })
-  userId: User['id'];
+  userId: User;
 
   @ManyToOne(() => Activity, (activity) => activity.comments, {
     nullable: false,
@@ -31,7 +31,7 @@ export class Comment {
     name: 'activity_id',
     referencedColumnName: 'id',
   })
-  activityId: Activity['id'];
+  activityId: Activity;
 
   @Column({
     type: 'text',

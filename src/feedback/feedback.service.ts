@@ -10,11 +10,12 @@ export class FeedbackService {
   private manager: EntityManager;
 
   async create(createFeedbackDto: CreateFeedbackDto, @Req() req: Request) {
-    const { content } = createFeedbackDto;
+    const { content, title } = createFeedbackDto;
     const userId = req['user_id'];
 
     await this.manager.save(FeedBack, {
       content,
+      title,
       userId,
     });
 

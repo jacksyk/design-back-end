@@ -25,6 +25,13 @@ export class FeedBack {
 
   @Column({
     type: 'varchar',
+    length: 255,
+    comment: '反馈标题',
+  })
+  title: string;
+
+  @Column({
+    type: 'varchar',
     length: 500,
   })
   content: string; // 反馈的内容

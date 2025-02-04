@@ -87,8 +87,6 @@ export class LoginGuard implements CanActivate {
 
       request['user_id'] = id;
 
-      console.log('id', id);
-
       return true;
     } catch {
       await this.redisClient.del(id.toString());
