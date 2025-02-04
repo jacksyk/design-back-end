@@ -49,7 +49,7 @@ export class ActivityService {
     };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, @Req() request: Request) {
     const activity = await this.manager.findOne(Activity, {
       where: { id },
       relations: ['user'],
@@ -59,7 +59,9 @@ export class ActivityService {
       return new NotFoundException('活动未找到');
     }
 
-    return activity;
+    const status = await this.getStatus(id, request);
+
+    return Object.assign(activity, status);
   }
 
   async remove(id: number) {

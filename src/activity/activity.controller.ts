@@ -48,8 +48,8 @@ export class ActivityController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.activityService.findOne(+id);
+  findOne(@Param('id') id: string, @Req() request: Request) {
+    return this.activityService.findOne(+id, request);
   }
 
   @Delete(':id')

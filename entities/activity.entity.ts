@@ -102,6 +102,16 @@ export class Activity {
   })
   collections: number;
 
+  @Column({
+    name: 'tags',
+    type: 'varchar',
+    length: 255,
+    comment: '活动标签，多个标签用逗号分隔',
+    nullable: true,
+    default: '',
+  })
+  tags: string;
+
   @OneToMany(() => UserActivity, (userActivity) => userActivity.activity)
   userActivities: UserActivity[];
 
