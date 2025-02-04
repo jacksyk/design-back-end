@@ -44,7 +44,6 @@ export class ActivityController {
   @UseGuards(LoginGuard)
   @Get('user')
   findByUserId(@Req() request: Request) {
-    // return 'hello';
     return this.activityService.findByUserId(request);
   }
 
@@ -61,5 +60,10 @@ export class ActivityController {
   @Post('/search')
   search(@Body() searchActivityDto: SearchActivityDto) {
     return this.activityService.search(searchActivityDto);
+  }
+
+  @Get('status/:id')
+  getStatus(@Param('id') id: string, @Req() request: Request) {
+    return this.activityService.getStatus(+id, request);
   }
 }

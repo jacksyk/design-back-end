@@ -9,7 +9,7 @@ import {
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager, Like } from 'typeorm';
 import { CreateActivityDto, GetQueryDto, SearchActivityDto } from './dto';
-import { Activity, Comment } from 'entities';
+import { Activity, Comment, UserActivity } from 'entities';
 import { RedisClientType } from 'redis';
 
 @Injectable()
@@ -194,5 +194,30 @@ export class ActivityService {
     });
 
     return data;
+  }
+
+  async getStatus(activityId: number, @Req() request: Request) {
+    const status = await this.manager.findOne(UserActivity, {
+      where: {
+        user: {
+          id: request['user_id'],
+        },
+        activity: {
+          id: activityId,
+        },
+      },
+    });
+
+    if (!status) {
+      return {
+        isLiked: false,
+        isCollected: false,
+      };
+    }
+
+    return {
+      isLiked: status.isLiked === 1,
+      isCollected: status.isCollected === 1,
+    };
   }
 }
