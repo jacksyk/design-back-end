@@ -11,6 +11,7 @@ import {
 import { FeedbackService } from './feedback.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { LoginGuard } from 'common/guard/login.guard';
+import { ReplayFeedbackDto } from './dto/replay-feedback';
 
 @UseGuards(LoginGuard)
 @Controller('feedback')
@@ -40,5 +41,15 @@ export class FeedbackController {
   @Get('/reply')
   getReplyFeedback(@Req() request: Request) {
     return this.feedbackService.reply(request);
+  }
+
+  @Get('/read/:id')
+  read(@Param('id') id: string) {
+    return this.feedbackService.read(+id);
+  }
+
+  @Post('/reply')
+  sendReply(@Body() body: ReplayFeedbackDto) {
+    return this.feedbackService.sendReply(body);
   }
 }

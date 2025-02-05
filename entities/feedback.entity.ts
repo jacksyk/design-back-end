@@ -38,10 +38,11 @@ export class FeedBack {
 
   @Column({
     type: 'enum',
-    enum: ['pending', 'processing', 'resolved'],
+    /** 等待处理 --> 处理 --> 已读 */
+    enum: ['pending', 'resolved', 'readed'],
     default: 'pending',
   })
-  status: string; // 反馈状态
+  status: 'pending' | 'resolved' | 'readed'; // 反馈状态
 
   @Column({
     type: 'varchar',

@@ -1,8 +1,16 @@
-import { Injectable, NotFoundException, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Injectable,
+  NotFoundException,
+  Param,
+  Req,
+} from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager, IsNull, Not } from 'typeorm';
 import { FeedBack } from 'entities';
+import { ReplayFeedbackDto } from './dto/replay-feedback';
 
 @Injectable()
 export class FeedbackService {
@@ -58,6 +66,7 @@ export class FeedbackService {
       where: {
         userId,
         reply: Not(IsNull()),
+        status: 'resolved',
       },
     });
 
@@ -65,5 +74,51 @@ export class FeedbackService {
       data,
       totalCount,
     };
+  }
+
+  async read(@Param() id: number) {
+    await this.manager.update(
+      FeedBack,
+      {
+        id,
+      },
+      {
+        status: 'readed',
+      },
+    );
+
+    return '标为已读';
+  }
+
+  async sendReply(@Body() body: ReplayFeedbackDto) {
+    const { id, reply } = body;
+
+    const feedback = await this.manager.findOne(FeedBack, {
+      where: { id },
+    });
+
+    console.log('id', id);
+
+    if (!feedback) {
+      throw new NotFoundException('反馈不存在');
+    }
+
+    // 反馈状态不对
+    if (feedback.status !== 'pending') {
+      throw new BadRequestException('已经反馈过了，不应出现');
+    }
+
+    await this.manager.update(
+      FeedBack,
+      {
+        id,
+      },
+      {
+        reply,
+        status: 'resolved',
+      },
+    );
+
+    return '回复成功';
   }
 }
