@@ -52,4 +52,10 @@ export class FeedbackController {
   sendReply(@Body() body: ReplayFeedbackDto) {
     return this.feedbackService.sendReply(body);
   }
+
+  /** 获取一个用户所有的feedback */
+  @Get('/person')
+  findPersonFeedback(@Req() request: Request) {
+    return this.feedbackService.findPersonFeedback(request);
+  }
 }

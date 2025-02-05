@@ -121,4 +121,17 @@ export class FeedbackService {
 
     return '回复成功';
   }
+
+  async findPersonFeedback(@Req() req: Request) {
+    const userId = req['user_id'];
+    const data = await this.manager.find(FeedBack, {
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+    });
+
+    return data;
+  }
 }

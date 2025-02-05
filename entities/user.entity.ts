@@ -64,6 +64,15 @@ export class User {
   })
   avatar: string;
 
+  /** 个人简介 */
+  @Column({
+    name: 'introduction',
+    length: 255,
+    comment: '个人简介',
+    nullable: true,
+  })
+  introduction: string;
+
   /** 一对多 */
   @OneToMany(() => Activity, (activity) => activity.user)
   activities: Activity[];
