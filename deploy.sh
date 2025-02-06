@@ -9,18 +9,17 @@ SERVER_PATH="/www/wwwroot/back-end"
 echo "Building the project..."
 pnpm build
 
-# 在上传之前，先移除服务器的文件
-echo "Removing existing files on the server..."
-ssh $SERVER_USER@$SERVER_IP "rm -rf $SERVER_PATH/*"
-
+# 在上传之前，先移除服务器的文件，但保留 public 文件夹
+echo "Removing existing files on the server except public folder..."
+ssh $SERVER_USER@$SERVER_IP "cd $SERVER_PATH && find . -maxdepth 1 ! -name 'public' ! -name '.' -exec rm -rf {} +"
 
 # 上传 dist 文件到服务器
 echo "Uploading dist files to the server..."
 scp -r dist $SERVER_USER@$SERVER_IP:$SERVER_PATH
 
-# 上传其他项目文件到服务器，排除 node_modules
+# 上传其他项目文件到服务器，排除 node_modules、dist 和 public
 echo "Uploading other project files to the server..."
-scp -r $(ls | grep -v 'node_modules' | grep -v 'dist') $SERVER_USER@$SERVER_IP:$SERVER_PATH
+scp -r $(ls | grep -v 'node_modules' | grep -v 'dist' | grep -v 'public') $SERVER_USER@$SERVER_IP:$SERVER_PATH
 
 # 在服务器上运行 docker-compose
 echo "Running docker-compose on the server..."

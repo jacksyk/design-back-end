@@ -5,7 +5,7 @@ import { Activity } from 'entities';
 import { RedisClientType } from 'redis';
 import { EntityManager } from 'typeorm';
 import { UserActivity } from 'entities';
-
+import { EmailService } from 'src/email/email.service';
 @Injectable()
 export class TaskService {
   @Inject('REDIS_CLIENT')
@@ -14,6 +14,9 @@ export class TaskService {
   // 注入实体管理器
   @InjectEntityManager()
   private manager: EntityManager;
+
+  @Inject(EmailService)
+  private emailService: EmailService;
 
   // 将redis数据同步到数据库当中
   @Cron(CronExpression.EVERY_10_SECONDS)

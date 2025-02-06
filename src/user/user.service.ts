@@ -8,7 +8,7 @@ import {
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
-import { Activity, User } from 'entities';
+import { Activity, User, UserActivity } from 'entities';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RedisClientType } from 'redis';
 import { ActivityService } from 'src/activity/activity.service';
@@ -59,11 +59,33 @@ export class UserService {
       relations: ['activities', 'comments', 'feedback'],
     });
 
+    const [, collectionCount] = await this.manager.findAndCount(UserActivity, {
+      where: {
+        user: {
+          id,
+        },
+        isCollected: 1,
+      },
+    });
+
+    const [, likesCount] = await this.manager.findAndCount(UserActivity, {
+      where: {
+        user: {
+          id,
+        },
+        isLiked: 1,
+      },
+    });
+
     if (!data) {
       throw new BadRequestException('用户不存在');
     }
 
-    return data;
+    return {
+      ...data,
+      collectionCount,
+      likesCount,
+    };
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {

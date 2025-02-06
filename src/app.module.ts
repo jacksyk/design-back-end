@@ -24,6 +24,7 @@ import { SseModule } from './sse/sse.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { ResourceModule } from './resource/resource.module';
 import { ResourceClassifyModule } from './resource-classify/resource-classify.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { ResourceClassifyModule } from './resource-classify/resource-classify.mo
     FeedbackModule,
     ResourceModule,
     ResourceClassifyModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

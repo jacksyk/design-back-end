@@ -73,6 +73,24 @@ export class User {
   })
   introduction: string;
 
+  /** 学院 */
+  @Column({
+    name: 'college',
+    length: 50,
+    comment: '学院',
+    nullable: true,
+  })
+  college: string;
+
+  /** 联系方式 */
+  @Column({
+    name: 'contact',
+    length: 20,
+    comment: '联系方式',
+    nullable: true,
+  })
+  contact: string;
+
   /** 一对多 */
   @OneToMany(() => Activity, (activity) => activity.user)
   activities: Activity[];

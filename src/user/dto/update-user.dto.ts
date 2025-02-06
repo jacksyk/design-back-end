@@ -15,4 +15,13 @@ export class UpdateUserDto {
 
   @IsOptional()
   avatar?: string;
+
+  @IsOptional()
+  introduction: string;
+
+  @IsOptional()
+  college: string;
+
+  @IsOptional()
+  contact: string;
 }
