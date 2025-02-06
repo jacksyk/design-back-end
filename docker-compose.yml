@@ -6,7 +6,7 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
-      - /www/wwwroot/app-data:/app
+      - /www/wwwroot/public:/back-end/public
     ports:
       - '3000:3000'
     networks:

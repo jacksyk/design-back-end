@@ -18,7 +18,7 @@ export class TaskService {
   @Inject(EmailService)
   private emailService: EmailService;
 
-  // 将redis数据同步到数据库当中
+  // 将redis数据同步到数据库当中,hello
   @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCron() {
     try {
