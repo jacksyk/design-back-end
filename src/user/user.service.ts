@@ -39,7 +39,7 @@ export class UserService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { student_id } = createUserDto;
+    const { student_id, email, password, code } = createUserDto;
     const isExist = await this.manager.findOne(User, {
       where: { student_id },
     });
@@ -48,7 +48,17 @@ export class UserService {
       throw new BadRequestException('用户已存在');
     }
 
-    const data = await this.manager.save(User, createUserDto);
+    const redisCode = await this.redisClient.get(`${email}:${code}`);
+
+    if (redisCode !== code) {
+      throw new BadRequestException('验证码错误');
+    }
+
+    const data = await this.manager.save(User, {
+      student_id,
+      email,
+      password,
+    });
 
     return data;
   }

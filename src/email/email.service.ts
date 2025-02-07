@@ -20,7 +20,7 @@ export class EmailService {
   async sendMail({ to, subject, html }) {
     await this.transporter.sendMail({
       from: {
-        name: '湖北科技学院',
+        name: '校园信息交流平台',
         address: '2482693496@qq.com',
       },
       to,

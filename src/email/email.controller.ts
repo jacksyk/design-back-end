@@ -1,15 +1,23 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { EmailService } from './email.service';
 import { SendEmailMessage } from './dto/send-email-message';
+import { RedisClientType } from 'redis';
 
 @Controller('email')
 export class EmailController {
+  @Inject('REDIS_CLIENT')
+  private redisClient: RedisClientType;
+
   constructor(private readonly emailService: EmailService) {}
 
   @Post()
   async sendEmailMessage(@Body() body: SendEmailMessage) {
-    const { to } = body;
-    const code = '123456'; // 验证码应该是动态生成的
+    const { to: address } = body;
+    const code = Math.random().toString().slice(-6).toString();
+    // 五分钟过期
+    await this.redisClient.set(`${address}:${code}`, code, {
+      EX: 5 * 60,
+    });
 
     const htmlContent = `
       <div style="background-color: #f6f6f6; padding: 20px;">
@@ -36,8 +44,8 @@ export class EmailController {
     `;
 
     await this.emailService.sendMail({
-      to,
-      subject: '刘家庆的工作驿站',
+      to: address,
+      subject: '注册验证码',
       html: htmlContent,
     });
 

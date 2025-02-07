@@ -5,6 +5,7 @@ import {
   NotFoundException,
   Query,
   Req,
+  Logger,
 } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager, Like } from 'typeorm';
@@ -23,6 +24,8 @@ export class ActivityService {
   private redisClient: RedisClientType;
 
   private prefix: string;
+
+  private logger = new Logger(ActivityService.name);
 
   constructor() {
     this.prefix = 'activity';
@@ -99,7 +102,7 @@ export class ActivityService {
 
     const status = await this.getStatus(activityId, request);
 
-    console.log('status', status);
+    this.logger.debug(status, '获取到的status');
 
     // 获取所有计数器
     const key = `activity:${activityId}`;
@@ -263,8 +266,13 @@ export class ActivityService {
       ),
     );
 
+    this.logger.log(`users:${userId}:${activityId}`);
+
+    this.logger.debug(isLiked, isCollected, 'status');
+
     // 都查不到的情况
     if (isNull(isLiked) && isNull(isCollected)) {
+      this.logger.debug('都查不到的情况');
       const status = await this.manager.findOne(UserActivity, {
         where: {
           user: {
@@ -290,6 +298,7 @@ export class ActivityService {
     }
 
     if (!isNull(isLiked) && isNull(isCollected)) {
+      this.logger.debug('isLiked不为null,isCollected为null的情况');
       const status = await this.manager.findOne(UserActivity, {
         where: {
           user: {
@@ -309,6 +318,7 @@ export class ActivityService {
     }
 
     if (isNull(isLiked) && !isNull(isCollected)) {
+      this.logger.debug('isLiked为null,isCollected不为null的情况');
       const status = await this.manager.findOne(UserActivity, {
         where: {
           user: {
@@ -329,6 +339,7 @@ export class ActivityService {
 
     // 都不为null的情况
     if (!isNull(isLiked) && !isNull(isCollected)) {
+      this.logger.debug('都不为null的情况');
       return {
         isLiked: isLiked === '1',
         isCollected: isCollected === '1',

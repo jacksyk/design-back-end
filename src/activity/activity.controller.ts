@@ -47,6 +47,8 @@ export class ActivityController {
     return this.activityService.findByUserId(request);
   }
 
+  /** 这个依赖于用户的登录状态 */
+  @UseGuards(LoginGuard)
   @Get(':id')
   findOne(@Param('id') id: string, @Req() request: Request) {
     return this.activityService.findOne(+id, request);
