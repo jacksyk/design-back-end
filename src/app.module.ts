@@ -11,6 +11,7 @@ import {
   FeedBack,
   Resource,
   ResourceClassify,
+  Email,
 } from 'entities';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginModule } from './login/login.module';
@@ -44,6 +45,7 @@ import { EmailModule } from './email/email.module';
         FeedBack,
         Resource,
         ResourceClassify,
+        Email,
       ],
       synchronize: true,
     }),

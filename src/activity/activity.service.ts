@@ -11,6 +11,7 @@ import { EntityManager, Like } from 'typeorm';
 import { CreateActivityDto, GetQueryDto, SearchActivityDto } from './dto';
 import { Activity, Comment, UserActivity } from 'entities';
 import { RedisClientType } from 'redis';
+import { isNull } from 'lodash';
 
 @Injectable()
 export class ActivityService {
@@ -43,15 +44,36 @@ export class ActivityService {
         take: limit,
       },
     );
+
+    // 获取每个活动的计数器数据
+    const activitiesWithCounters = await Promise.all(
+      allActivity.map(async (activity) => {
+        const key = `activity:${activity.id}`;
+        const counterFields = ['views', 'likes', 'collections'];
+        const counters = await Promise.all(
+          counterFields.map((field) => this.redisClient.hGet(key, field)),
+        );
+
+        const counterData = counterFields.reduce((acc, field, index) => {
+          if (counters[index]) {
+            acc[field] = parseInt(counters[index]);
+          }
+          return acc;
+        }, {});
+
+        return Object.assign(activity, counterData);
+      }),
+    );
+
     return {
-      data: allActivity,
+      data: activitiesWithCounters,
       totalCount,
     };
   }
 
-  async findOne(id: number, @Req() request: Request) {
+  async findOne(activityId: number, @Req() request: Request) {
     const activity = await this.manager.findOne(Activity, {
-      where: { id },
+      where: { id: activityId },
       relations: ['user'],
     });
 
@@ -59,9 +81,23 @@ export class ActivityService {
       return new NotFoundException('活动未找到');
     }
 
-    const status = await this.getStatus(id, request);
+    const status = await this.getStatus(activityId, request);
 
-    return Object.assign(activity, status);
+    // 获取所有计数器
+    const key = `activity:${activityId}`;
+    const counterFields = ['views', 'likes', 'collections'];
+    const counters = await Promise.all(
+      counterFields.map((field) => this.redisClient.hGet(key, field)),
+    );
+
+    const counterData = counterFields.reduce((acc, field, index) => {
+      if (counters[index]) {
+        acc[field] = parseInt(counters[index]);
+      }
+      return acc;
+    }, {});
+
+    return Object.assign(activity, status, counterData);
   }
 
   async remove(id: number) {
@@ -199,6 +235,27 @@ export class ActivityService {
   }
 
   async getStatus(activityId: number, @Req() request: Request) {
+    const userId = request['user_id'];
+    // const userId = 1;
+
+    const propertyArray = ['likes', 'collections'];
+
+    const [isLiked, isCollected] = await Promise.all(
+      propertyArray.map((item) =>
+        this.redisClient.hGet(`users:${userId}:${activityId}`, item),
+      ),
+    );
+
+    if (!isNull(isLiked) && !isNull(isCollected)) {
+      console.log('111');
+      return {
+        isLiked,
+        isCollected,
+      };
+    }
+
+    console.log(isLiked, isCollected);
+
     const status = await this.manager.findOne(UserActivity, {
       where: {
         user: {
