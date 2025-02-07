@@ -36,12 +36,32 @@ export class TaskService {
             const data = await this.redisClient.hGetAll(key);
 
             if (Object.keys(data).length) {
-              const { likes = '0', views = '0', collections = '0' } = data;
-              await transactionalEntityManager.update(Activity, id, {
-                likes: parseInt(likes),
-                views: parseInt(views),
-                collections: parseInt(collections),
-              });
+              const { likes, views, collections } = data;
+              const updateData: {
+                views?: number;
+                likes?: number;
+                collections?: number;
+              } = {
+                views: undefined,
+                likes: undefined,
+                collections: undefined,
+              };
+
+              if (likes) {
+                updateData.likes = parseInt(likes);
+              }
+              if (views) {
+                updateData.views = parseInt(views);
+              }
+              if (collections) {
+                updateData.collections = parseInt(collections);
+              }
+
+              await transactionalEntityManager.update(
+                Activity,
+                id,
+                JSON.parse(JSON.stringify(updateData)),
+              );
             }
           } catch (err) {
             console.error(`同步activity数据失败: ${key}`, err);
@@ -56,7 +76,21 @@ export class TaskService {
             const data = await this.redisClient.hGetAll(key);
 
             if (Object.keys(data).length) {
-              const { likes = '0', collections = '0' } = data;
+              const { likes, collections } = data;
+              const updateData: {
+                isLiked?: number;
+                isCollected?: number;
+              } = {
+                isLiked: undefined,
+                isCollected: undefined,
+              };
+
+              if (likes) {
+                updateData['isLiked'] = parseInt(likes);
+              }
+              if (collections) {
+                updateData['isCollected'] = parseInt(collections);
+              }
               const userActivity = await transactionalEntityManager.findOne(
                 UserActivity,
                 {
@@ -75,10 +109,7 @@ export class TaskService {
                 await transactionalEntityManager.update(
                   UserActivity,
                   userActivity.id,
-                  {
-                    isLiked: +likes,
-                    isCollected: +collections, // 添加 isCollected 的更新
-                  },
+                  JSON.parse(JSON.stringify(updateData)),
                 );
                 continue;
               }
@@ -117,7 +148,7 @@ export class TaskService {
   //         </div>
   //         <div style="color: #333; font-size: 18px; line-height: 2; text-align: justify;">
   //           <p style="text-indent: 2em; margin-bottom: 30px;">徐宜凡同学：</p>
-  //           <p style="text-indent: 2em;">在过去的一年里，你以优异的学习成绩、突出的综合表现和卓越的领导才能，在我校学生中脱颖而出。经过严格评选，被评为"2024年校园最佳大学生"。</p>
+  //           <p style="text-indent: 2em;">在过去的一年里，你以优异的学习成绩、突出的综合表现和卓越的领导才能，在我校学生中脱颖而出。经过严格评选，评为"2024年校园最佳大学生"。</p>
   //           <div style="background-color: #fff8f8; padding: 25px; border: 1px solid #8b0000; margin: 25px 0;">
   //             <p style="margin: 0; text-align: center; font-size: 20px; color: #8b0000;">
   //               主要事迹：<br>
