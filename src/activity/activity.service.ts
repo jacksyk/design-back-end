@@ -35,13 +35,29 @@ export class ActivityService {
   }
 
   async findAll(@Query() query: GetQueryDto) {
-    const { limit = 1, page = 1 } = query;
+    const { limit = 1, page = 1, isOrder = 'DESC', searchContent } = query;
+
+    const where: any[] = [];
+
+    if (searchContent) {
+      where.push({
+        title: Like(`%${searchContent}%`),
+      });
+      where.push({
+        description: Like(`%${searchContent}%`),
+      });
+    }
+
     const [allActivity, totalCount] = await this.manager.findAndCount(
       Activity,
       {
         relations: ['user'],
         skip: (page - 1) * limit,
         take: limit,
+        order: {
+          created_at: isOrder,
+        },
+        where,
       },
     );
 
@@ -82,6 +98,8 @@ export class ActivityService {
     }
 
     const status = await this.getStatus(activityId, request);
+
+    console.log('status', status);
 
     // 获取所有计数器
     const key = `activity:${activityId}`;
@@ -236,7 +254,6 @@ export class ActivityService {
 
   async getStatus(activityId: number, @Req() request: Request) {
     const userId = request['user_id'];
-    // const userId = 1;
 
     const propertyArray = ['likes', 'collections'];
 
@@ -246,37 +263,76 @@ export class ActivityService {
       ),
     );
 
+    // 都查不到的情况
+    if (isNull(isLiked) && isNull(isCollected)) {
+      const status = await this.manager.findOne(UserActivity, {
+        where: {
+          user: {
+            id: request['user_id'],
+          },
+          activity: {
+            id: activityId,
+          },
+        },
+      });
+
+      if (!status) {
+        return {
+          isLiked: false,
+          isCollected: false,
+        };
+      }
+
+      return {
+        isLiked: status.isLiked === 1,
+        isCollected: status.isCollected === 1,
+      };
+    }
+
+    if (!isNull(isLiked) && isNull(isCollected)) {
+      const status = await this.manager.findOne(UserActivity, {
+        where: {
+          user: {
+            id: request['user_id'],
+          },
+        },
+      });
+
+      if (!status) {
+        throw new NotFoundException('用户活动关系不存在');
+      }
+
+      return {
+        isLiked: isLiked === '1',
+        isCollected: status['isCollected'] === 1,
+      };
+    }
+
+    if (isNull(isLiked) && !isNull(isCollected)) {
+      const status = await this.manager.findOne(UserActivity, {
+        where: {
+          user: {
+            id: request['user_id'],
+          },
+        },
+      });
+
+      if (!status) {
+        throw new NotFoundException('用户活动关系不存在');
+      }
+
+      return {
+        isLiked: status['isLiked'] === 1,
+        isCollected: isCollected === '1',
+      };
+    }
+
+    // 都不为null的情况
     if (!isNull(isLiked) && !isNull(isCollected)) {
-      console.log('111');
       return {
-        isLiked,
-        isCollected,
+        isLiked: isLiked === '1',
+        isCollected: isCollected === '1',
       };
     }
-
-    console.log(isLiked, isCollected);
-
-    const status = await this.manager.findOne(UserActivity, {
-      where: {
-        user: {
-          id: request['user_id'],
-        },
-        activity: {
-          id: activityId,
-        },
-      },
-    });
-
-    if (!status) {
-      return {
-        isLiked: false,
-        isCollected: false,
-      };
-    }
-
-    return {
-      isLiked: status.isLiked === 1,
-      isCollected: status.isCollected === 1,
-    };
   }
 }
