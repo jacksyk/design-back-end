@@ -45,16 +45,21 @@ export class UserController {
     return this.userService.update(+userId, updateUserDto);
   }
 
+  /** 点赞 */
+  @UseGuards(LoginGuard)
   @Get('likes/:id')
   likes(@Param('id') id: string, @Req() req: Request) {
     return this.userService.likes(+id, req);
   }
 
+  /** 收藏 */
+  @UseGuards(LoginGuard)
   @Get('collections/:id')
   collections(@Param('id') id: string, @Req() req: Request) {
     return this.userService.collections(+id, req);
   }
 
+  /** 浏览 */
   @Get('views/:id')
   views(@Param('id') id: string) {
     return this.userService.views(+id);

@@ -26,6 +26,7 @@ import { FeedbackModule } from './feedback/feedback.module';
 import { ResourceModule } from './resource/resource.module';
 import { ResourceClassifyModule } from './resource-classify/resource-classify.module';
 import { EmailModule } from './email/email.module';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { EmailModule } from './email/email.module';
     ResourceModule,
     ResourceClassifyModule,
     EmailModule,
+    WebsocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],
