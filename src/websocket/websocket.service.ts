@@ -9,6 +9,8 @@ export class WebsocketService {
   @Inject('REDIS_CLIENT')
   private redisClient: RedisClientType;
 
+  private count: number = 0;
+
   async create(createWebsocketDto: CreateWebsocketDto, server: Server) {
     const { content, timestamp } = createWebsocketDto;
 
@@ -56,15 +58,22 @@ export class WebsocketService {
     server.emit('system', {
       message: `${username}进入聊天室`,
     });
+    this.count++;
+    server.emit('count', {
+      count: this.count,
+    });
     return;
   }
 
   leave(body: EnterMessageDto, server: Server) {
     const { username } = body;
     console.log('leave');
-    // console.log('userName', username, body);
     server.emit('system', {
       message: `${username}离开聊天室`,
+    });
+    this.count--;
+    server.emit('count', {
+      count: this.count,
     });
     return;
   }
