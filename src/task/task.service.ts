@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { Activity } from 'entities';
+import { Activity } from '../../entities';
 import { RedisClientType } from 'redis';
 import { EntityManager } from 'typeorm';
-import { UserActivity } from 'entities';
+import { UserActivity } from '../../entities';
 import { EmailService } from 'src/email/email.service';
 @Injectable()
 export class TaskService {

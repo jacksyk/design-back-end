@@ -9,7 +9,7 @@ import {
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager, IsNull, Not } from 'typeorm';
-import { FeedBack } from 'entities';
+import { FeedBack } from '../../entities';
 import { ReplayFeedbackDto } from './dto/replay-feedback';
 
 @Injectable()

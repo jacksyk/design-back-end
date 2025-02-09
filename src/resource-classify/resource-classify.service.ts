@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateResourceClassifyDto } from './dto/create-resource-classify.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
-import { ResourceClassify } from 'entities';
+import { ResourceClassify } from '../../entities';
 
 @Injectable()
 export class ResourceClassifyService {

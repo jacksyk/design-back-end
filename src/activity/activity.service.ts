@@ -10,7 +10,7 @@ import {
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager, Like } from 'typeorm';
 import { CreateActivityDto, GetQueryDto, SearchActivityDto } from './dto';
-import { Activity, Comment, UserActivity } from 'entities';
+import { Activity, Comment, UserActivity } from '../../entities';
 import { RedisClientType } from 'redis';
 import { isNull } from 'lodash';
 

@@ -3,7 +3,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
-import { Comment } from 'entities';
+import { Comment } from '../../entities';
 @Injectable()
 export class CommentService {
   @InjectEntityManager()

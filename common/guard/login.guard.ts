@@ -12,7 +12,7 @@ import { RedisClientType } from 'redis';
 import { Reflector } from '@nestjs/core';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
-import { User } from 'entities';
+import { User } from '../../entities';
 
 @Injectable()
 

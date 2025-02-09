@@ -3,16 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import {
-  User,
-  Activity,
-  UserActivity,
-  Comment,
-  FeedBack,
-  Resource,
-  ResourceClassify,
-  Email,
-} from 'entities';
+import { UserActivity } from '../entities/user-activity.entity';
+import { Comment } from '../entities/comment.entity';
+import { FeedBack } from '../entities/feedback.entity';
+import { Resource } from '../entities/resource.entity';
+import { ResourceClassify } from '../entities/resource-classify.entity';
+import { Email } from '../entities/email.entity';
+import { User } from '../entities/user.entity';
+import { Activity } from '../entities/activity.entity';
+
 import { JwtModule } from '@nestjs/jwt';
 import { LoginModule } from './login/login.module';
 import { RedisModule } from './redis/redis.module';
@@ -38,11 +37,12 @@ import { WebsocketModule } from './websocket/websocket.module';
       username: 'root',
       password: 'kang',
       database: 'mysql',
+      // 注册所有实体
       entities: [
         User,
         Activity,
-        Comment,
         UserActivity,
+        Comment,
         FeedBack,
         Resource,
         ResourceClassify,

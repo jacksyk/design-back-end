@@ -8,7 +8,7 @@ import {
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
-import { Activity, User, UserActivity } from 'entities';
+import { Activity, User, UserActivity } from '../../entities';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RedisClientType } from 'redis';
 import { ActivityService } from 'src/activity/activity.service';
