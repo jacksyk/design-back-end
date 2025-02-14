@@ -43,14 +43,6 @@ export class WebsocketGateway implements OnGatewayConnection {
         await this.websocketService.leave(leaveData, this.server);
         this.map.delete(client.id);
       }
-      // Logger.error('断开连接！！！', client.id);
-      // if (this.server) {
-      // this.server.emit('system', {
-      //   message: `用户离开了聊天室`,
-      //   timestamp: new Date(),
-      // });
-      // this.websocketService.handleDisconnect(this.server);
-      // }
     });
   }
   @SubscribeMessage('sendMessage')

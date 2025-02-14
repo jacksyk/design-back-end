@@ -11,7 +11,8 @@ import { ResourceClassify } from '../entities/resource-classify.entity';
 import { Email } from '../entities/email.entity';
 import { User } from '../entities/user.entity';
 import { Activity } from '../entities/activity.entity';
-
+import { ToolLibrary } from '../entities/tool-library.entity';
+import { ToolLibraryTag } from '../entities/tool-library-tag.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginModule } from './login/login.module';
 import { RedisModule } from './redis/redis.module';
@@ -26,6 +27,7 @@ import { ResourceModule } from './resource/resource.module';
 import { ResourceClassifyModule } from './resource-classify/resource-classify.module';
 import { EmailModule } from './email/email.module';
 import { WebsocketModule } from './websocket/websocket.module';
+import { ToolLibraryModule } from './tool-library/tool-library.module';
 
 @Module({
   imports: [
@@ -47,6 +49,8 @@ import { WebsocketModule } from './websocket/websocket.module';
         Resource,
         ResourceClassify,
         Email,
+        ToolLibrary,
+        ToolLibraryTag,
       ],
       synchronize: true,
     }),
@@ -70,6 +74,7 @@ import { WebsocketModule } from './websocket/websocket.module';
     ResourceClassifyModule,
     EmailModule,
     WebsocketModule,
+    ToolLibraryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
