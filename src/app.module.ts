@@ -28,6 +28,7 @@ import { ResourceClassifyModule } from './resource-classify/resource-classify.mo
 import { EmailModule } from './email/email.module';
 import { WebsocketModule } from './websocket/websocket.module';
 import { ToolLibraryModule } from './tool-library/tool-library.module';
+import { TranslateModule } from './translate/translate.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { ToolLibraryModule } from './tool-library/tool-library.module';
     EmailModule,
     WebsocketModule,
     ToolLibraryModule,
+    TranslateModule,
   ],
   controllers: [AppController],
   providers: [AppService],

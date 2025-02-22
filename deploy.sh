@@ -24,6 +24,10 @@ scp -r $(ls | grep -v 'node_modules' | grep -v 'dist' | grep -v 'public') $SERVE
 
 # 在服务器上运行 docker-compose
 echo -e "${BLUE}Running docker-compose on the server...${NC}"
-ssh $SERVER_USER@$SERVER_IP "cd $SERVER_PATH && docker stop graduation_app && docker rm graduation_app && docker rmi back-end-app:latest && docker-compose up -d"
+ssh $SERVER_USER@$SERVER_IP "cd $SERVER_PATH && \
+  docker stop graduation_app || true && \
+  docker rm graduation_app || true && \
+  docker rmi back-end-app:latest || true && \
+  docker-compose up -d"
 
 echo -e "${GREEN}Deployment completed successfully!${NC}"

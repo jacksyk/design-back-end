@@ -32,6 +32,13 @@ export class Activity {
   description: string;
 
   @Column({
+    name: 'content',
+    type: 'text',
+    comment: '活动内容',
+  })
+  content: string;
+
+  @Column({
     name: 'start_time',
     type: 'timestamp',
     comment: '活动开始时间',
