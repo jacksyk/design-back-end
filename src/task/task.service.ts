@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { Activity } from '../../entities';
@@ -91,6 +91,9 @@ export class TaskService {
               if (collections) {
                 updateData['isCollected'] = parseInt(collections);
               }
+
+              Logger.warn(updateData, 'updateData');
+
               const userActivity = await transactionalEntityManager.findOne(
                 UserActivity,
                 {
@@ -114,16 +117,18 @@ export class TaskService {
                 continue;
               }
 
-              await transactionalEntityManager.save(UserActivity, {
-                user: {
-                  id: parseInt(user_id),
-                },
-                activity: {
-                  id: parseInt(activity_id),
-                },
-                isLiked: +likes,
-                isCollected: +collections,
-              });
+              if (user_id && activity_id) {
+                await transactionalEntityManager.save(UserActivity, {
+                  user: {
+                    id: parseInt(user_id),
+                  },
+                  activity: {
+                    id: parseInt(activity_id),
+                  },
+                  isLiked: likes ? +likes : 0,
+                  isCollected: collections ? +collections : 0,
+                });
+              }
             }
           } catch (err) {
             console.error(`同步user_activities数据失败: ${key}`, err);
