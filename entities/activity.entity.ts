@@ -10,6 +10,13 @@ import {
 import { UserActivity } from './user-activity.entity';
 import { Comment } from './comment.entity';
 
+// 添加活动类型枚举
+export enum ActivityType {
+  CAMPUS = 'campus', // 校园活动
+  ACADEMIC = 'academic', // 教务通知
+  TUTOR = 'tutor', // 导员通知
+}
+
 @Entity({
   name: 'activity',
 })
@@ -124,4 +131,12 @@ export class Activity {
 
   @OneToMany(() => Comment, (comment) => comment.activityId)
   comments: Comment[];
+
+  @Column({
+    name: 'type',
+    type: 'enum',
+    enum: ActivityType,
+    comment: '活动类型',
+  })
+  type: ActivityType;
 }

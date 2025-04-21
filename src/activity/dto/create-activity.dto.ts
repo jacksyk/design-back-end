@@ -1,6 +1,7 @@
 import { isNotEmpty, IsNotEmpty, IsNumber } from 'class-validator';
 
 import { IsString } from 'class-validator';
+import { ActivityType } from 'entities';
 
 export class CreateActivityDto {
   @IsNotEmpty()
@@ -18,6 +19,10 @@ export class CreateActivityDto {
   @IsNotEmpty()
   @IsString()
   content: string;
+
+  @IsNotEmpty()
+  @IsString()
+  type: ActivityType;
 
   @IsNotEmpty()
   @IsNumber()
