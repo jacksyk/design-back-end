@@ -12,6 +12,7 @@ import { EntityManager, Like } from 'typeorm';
 import { CreateActivityDto, GetQueryDto, SearchActivityDto } from './dto';
 import { Activity, Comment, UserActivity } from '../../entities';
 import { RedisClientType } from 'redis';
+import { ActivityType } from '../../entities';
 import { isNull } from 'lodash';
 
 @Injectable()
@@ -172,6 +173,58 @@ export class ActivityService {
     return {
       data,
       totalCount: data.length,
+    };
+  }
+
+  async getCommonUtil(type: ActivityType) {
+    const [allActivity, totalCount] = await this.manager.findAndCount(
+      Activity,
+      {
+        where: {
+          type,
+        },
+        relations: ['user'],
+        order: {
+          created_at: 'DESC',
+        },
+      },
+    );
+    return {
+      allActivity,
+      totalCount,
+    };
+  }
+
+  /** 获取所有的校园活动 */
+  async getAllCampus() {
+    const { allActivity, totalCount } = await this.getCommonUtil(
+      ActivityType.CAMPUS,
+    );
+    return {
+      data: allActivity,
+      count: totalCount,
+    };
+  }
+
+  /** 获取所有的教务通知 */
+  async getAllAcademic() {
+    const { allActivity, totalCount } = await this.getCommonUtil(
+      ActivityType.ACADEMIC,
+    );
+    return {
+      data: allActivity,
+      count: totalCount,
+    };
+  }
+
+  /** 获取所有的导员信息 */
+  async getAllTutor() {
+    const { allActivity, totalCount } = await this.getCommonUtil(
+      ActivityType.TUTOR,
+    );
+    return {
+      data: allActivity,
+      count: totalCount,
     };
   }
 }

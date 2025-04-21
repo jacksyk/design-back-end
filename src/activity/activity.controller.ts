@@ -40,6 +40,21 @@ export class ActivityController {
     return this.activityService.findAll(query);
   }
 
+  @Get('/campus/all')
+  getAllCampus() {
+    return this.activityService.getAllCampus();
+  }
+
+  @Get('/academic/all')
+  getAllAcademic() {
+    return this.activityService.getAllAcademic();
+  }
+
+  @Get('/tutor/all')
+  getAllTutor() {
+    return this.activityService.getAllTutor();
+  }
+
   /** 查询某个用户的活动记录 */
   @UseGuards(LoginGuard)
   @Get('user')
