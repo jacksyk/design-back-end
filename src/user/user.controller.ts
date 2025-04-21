@@ -81,7 +81,7 @@ export class UserController {
 
   /** 浏览 */
   @Get('views/:id')
-  views(@Param('id') id: string) {
-    return this.userService.views(+id);
+  views(@Param('id') id: string, @Req() req: Request) {
+    return this.userService.views(+id, req);
   }
 }

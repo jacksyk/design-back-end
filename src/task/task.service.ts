@@ -21,124 +21,114 @@ export class TaskService {
   // 将redis数据同步到数据库当中,hello
   @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCron() {
-    try {
-      // 获取所有activity前缀的key, 存储活动 观看，点赞，收藏相关的数据
-      const activityKeys = await this.redisClient.keys('activity:*');
-      // 获取所有users前缀的key， 存储用户关于某篇文章的点赞，收藏相关数据
-      const userKeys = await this.redisClient.keys('users:*');
-
-      // 使用事务处理activity数据同步
-      await this.manager.transaction(async (transactionalEntityManager) => {
-        // 同步activity数据
-        for (const key of activityKeys) {
-          try {
-            const [, id] = key.split(':');
-            const data = await this.redisClient.hGetAll(key);
-
-            if (Object.keys(data).length) {
-              const { likes, views, collections } = data;
-              const updateData: {
-                views?: number;
-                likes?: number;
-                collections?: number;
-              } = {
-                views: undefined,
-                likes: undefined,
-                collections: undefined,
-              };
-
-              if (likes) {
-                updateData.likes = parseInt(likes);
-              }
-              if (views) {
-                updateData.views = parseInt(views);
-              }
-              if (collections) {
-                updateData.collections = parseInt(collections);
-              }
-
-              await transactionalEntityManager.update(
-                Activity,
-                id,
-                JSON.parse(JSON.stringify(updateData)),
-              );
-            }
-          } catch (err) {
-            console.error(`同步activity数据失败: ${key}`, err);
-            throw err; // 在事务中抛出错误以触发回滚
-          }
-        }
-
-        // 同步user_activities数据
-        for (const key of userKeys) {
-          try {
-            const [, user_id, activity_id] = key.split(':');
-            const data = await this.redisClient.hGetAll(key);
-
-            if (Object.keys(data).length) {
-              const { likes, collections } = data;
-              const updateData: {
-                isLiked?: number;
-                isCollected?: number;
-              } = {
-                isLiked: undefined,
-                isCollected: undefined,
-              };
-
-              if (likes) {
-                updateData['isLiked'] = parseInt(likes);
-              }
-              if (collections) {
-                updateData['isCollected'] = parseInt(collections);
-              }
-
-              Logger.warn(updateData, 'updateData');
-
-              const userActivity = await transactionalEntityManager.findOne(
-                UserActivity,
-                {
-                  where: {
-                    user: {
-                      id: parseInt(user_id),
-                    },
-                    activity: {
-                      id: parseInt(activity_id),
-                    },
-                  },
-                },
-              );
-
-              if (userActivity) {
-                await transactionalEntityManager.update(
-                  UserActivity,
-                  userActivity.id,
-                  JSON.parse(JSON.stringify(updateData)),
-                );
-                continue;
-              }
-
-              if (user_id && activity_id) {
-                await transactionalEntityManager.save(UserActivity, {
-                  user: {
-                    id: parseInt(user_id),
-                  },
-                  activity: {
-                    id: parseInt(activity_id),
-                  },
-                  isLiked: likes ? +likes : 0,
-                  isCollected: collections ? +collections : 0,
-                });
-              }
-            }
-          } catch (err) {
-            console.error(`同步user_activities数据失败: ${key}`, err);
-            throw err; // 在事务中抛出错误以触发回滚
-          }
-        }
-      });
-    } catch (err) {
-      console.error('同步数据失败:', err);
-    }
+    // todo: redis代办
+    // try {
+    //   // 获取所有activity前缀的key, 存储活动 观看，点赞，收藏相关的数据
+    //   const activityKeys = await this.redisClient.keys('activity:*');
+    //   // 获取所有users前缀的key， 存储用户关于某篇文章的点赞，收藏相关数据
+    //   const userKeys = await this.redisClient.keys('users:*');
+    //   // 使用事务处理activity数据同步
+    //   await this.manager.transaction(async (transactionalEntityManager) => {
+    //     // 同步activity数据
+    //     for (const key of activityKeys) {
+    //       try {
+    //         const [, id] = key.split(':');
+    //         const data = await this.redisClient.hGetAll(key);
+    //         if (Object.keys(data).length) {
+    //           const { likes, views, collections } = data;
+    //           const updateData: {
+    //             views?: number;
+    //             likes?: number;
+    //             collections?: number;
+    //           } = {
+    //             views: undefined,
+    //             likes: undefined,
+    //             collections: undefined,
+    //           };
+    //           if (likes) {
+    //             updateData.likes = parseInt(likes);
+    //           }
+    //           if (views) {
+    //             updateData.views = parseInt(views);
+    //           }
+    //           if (collections) {
+    //             updateData.collections = parseInt(collections);
+    //           }
+    //           await transactionalEntityManager.update(
+    //             Activity,
+    //             id,
+    //             JSON.parse(JSON.stringify(updateData)),
+    //           );
+    //         }
+    //       } catch (err) {
+    //         console.error(`同步activity数据失败: ${key}`, err);
+    //         throw err; // 在事务中抛出错误以触发回滚
+    //       }
+    //     }
+    //     // 同步user_activities数据
+    //     for (const key of userKeys) {
+    //       try {
+    //         const [, user_id, activity_id] = key.split(':');
+    //         const data = await this.redisClient.hGetAll(key);
+    //         if (Object.keys(data).length) {
+    //           const { likes, collections } = data;
+    //           const updateData: {
+    //             isLiked?: number;
+    //             isCollected?: number;
+    //           } = {
+    //             isLiked: undefined,
+    //             isCollected: undefined,
+    //           };
+    //           if (likes) {
+    //             updateData['isLiked'] = parseInt(likes);
+    //           }
+    //           if (collections) {
+    //             updateData['isCollected'] = parseInt(collections);
+    //           }
+    //           Logger.warn(updateData, 'updateData');
+    //           const userActivity = await transactionalEntityManager.findOne(
+    //             UserActivity,
+    //             {
+    //               where: {
+    //                 user: {
+    //                   id: parseInt(user_id),
+    //                 },
+    //                 activity: {
+    //                   id: parseInt(activity_id),
+    //                 },
+    //               },
+    //             },
+    //           );
+    //           if (userActivity) {
+    //             await transactionalEntityManager.update(
+    //               UserActivity,
+    //               userActivity.id,
+    //               JSON.parse(JSON.stringify(updateData)),
+    //             );
+    //             continue;
+    //           }
+    //           if (user_id && activity_id) {
+    //             await transactionalEntityManager.save(UserActivity, {
+    //               user: {
+    //                 id: parseInt(user_id),
+    //               },
+    //               activity: {
+    //                 id: parseInt(activity_id),
+    //               },
+    //               isLiked: likes ? +likes : 0,
+    //               isCollected: collections ? +collections : 0,
+    //             });
+    //           }
+    //         }
+    //       } catch (err) {
+    //         console.error(`同步user_activities数据失败: ${key}`, err);
+    //         throw err; // 在事务中抛出错误以触发回滚
+    //       }
+    //     }
+    //   });
+    // } catch (err) {
+    //   console.error('同步数据失败:', err);
+    // }
   }
 
   // 发送邮件

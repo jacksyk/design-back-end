@@ -171,31 +171,57 @@ export class UserService {
     }
 
     const user_id = req['user_id'];
-    const key = `${this.prefix}:${user_id}:${activity_id}`;
 
-    let isLike = await this.redisClient.hGet(key, 'likes'); // 0 未点赞 1 已点赞
+    // 使用事务处理点赞逻辑
+    return await this.manager.transaction(
+      async (transactionalEntityManager) => {
+        // 查找用户活动关系
+        const userActivity = await transactionalEntityManager.findOne(
+          UserActivity,
+          {
+            where: {
+              user: { id: user_id },
+              activity: { id: activity_id },
+            },
+          },
+        );
 
-    if (isLike === null) {
-      await this.redisClient.hSet(key, 'likes', '0');
-    }
+        if (!userActivity) {
+          // 首次点赞
+          await Promise.all([
+            transactionalEntityManager.save(UserActivity, {
+              user: { id: user_id },
+              activity: { id: activity_id },
+              isLiked: 1,
+            }),
+            transactionalEntityManager.update(Activity, activity_id, {
+              likes: activity.likes + 1,
+            }),
+          ]);
 
-    isLike = await this.redisClient.hGet(key, 'likes');
+          return {
+            data: '1',
+            message: '点赞成功',
+          };
+        } else {
+          // 切换点赞状态
+          const newLikeStatus = userActivity.isLiked === 1 ? 0 : 1;
+          await Promise.all([
+            transactionalEntityManager.update(UserActivity, userActivity.id, {
+              isLiked: newLikeStatus,
+            }),
+            transactionalEntityManager.update(Activity, activity_id, {
+              likes: activity.likes + (newLikeStatus === 1 ? 1 : -1),
+            }),
+          ]);
 
-    if (isLike === '0') {
-      await this.redisClient.hSet(key, 'likes', '1');
-      await this.activityService.likes(activity_id);
-      return {
-        data: '1',
-        message: '点赞成功',
-      };
-    }
-
-    await this.redisClient.hSet(key, 'likes', '0');
-    await this.activityService.cancelLikes(activity_id);
-    return {
-      data: '0',
-      message: '取消点赞',
-    };
+          return {
+            data: newLikeStatus.toString(),
+            message: newLikeStatus === 1 ? '点赞成功' : '取消点赞',
+          };
+        }
+      },
+    );
   }
 
   async collections(activity_id: number, @Req() req: Request) {
@@ -209,34 +235,60 @@ export class UserService {
     }
 
     const user_id = req['user_id'];
-    const key = `${this.prefix}:${user_id}:${activity_id}`;
 
-    let isCollection = await this.redisClient.hGet(key, 'collections');
+    // 使用事务处理收藏逻辑
+    return await this.manager.transaction(
+      async (transactionalEntityManager) => {
+        const userActivity = await transactionalEntityManager.findOne(
+          UserActivity,
+          {
+            where: {
+              user: { id: user_id },
+              activity: { id: activity_id },
+            },
+          },
+        );
 
-    if (isCollection === null) {
-      await this.redisClient.hSet(key, 'collections', '0');
-    }
+        if (!userActivity) {
+          // 首次收藏
+          await Promise.all([
+            transactionalEntityManager.save(UserActivity, {
+              user: { id: user_id },
+              activity: { id: activity_id },
+              isCollected: 1,
+            }),
+            transactionalEntityManager.update(Activity, activity_id, {
+              collections: activity.collections + 1,
+            }),
+          ]);
 
-    isCollection = await this.redisClient.hGet(key, 'collections');
+          return {
+            data: '1',
+            message: '收藏成功',
+          };
+        } else {
+          // 切换收藏状态
+          const newCollectionStatus = userActivity.isCollected === 1 ? 0 : 1;
+          await Promise.all([
+            transactionalEntityManager.update(UserActivity, userActivity.id, {
+              isCollected: newCollectionStatus,
+            }),
+            transactionalEntityManager.update(Activity, activity_id, {
+              collections:
+                activity.collections + (newCollectionStatus === 1 ? 1 : -1),
+            }),
+          ]);
 
-    if (isCollection === '0') {
-      await this.redisClient.hSet(key, 'collections', '1');
-      await this.activityService.collections(activity_id);
-      return {
-        data: '1',
-        message: '收藏成功',
-      };
-    }
-
-    await this.redisClient.hSet(key, 'collections', '0');
-    await this.activityService.cancelCollections(activity_id);
-    return {
-      data: '0',
-      message: '取消收藏',
-    };
+          return {
+            data: newCollectionStatus.toString(),
+            message: newCollectionStatus === 1 ? '收藏成功' : '取消收藏',
+          };
+        }
+      },
+    );
   }
 
-  async views(activity_id: number) {
+  async views(activity_id: number, @Req() req: Request) {
     // 先检查活动是否存在
     const activity = await this.manager.findOne(Activity, {
       where: { id: activity_id },
@@ -246,11 +298,51 @@ export class UserService {
       throw new NotFoundException('活动不存在');
     }
 
-    await this.activityService.views(activity_id);
+    const user_id = req['user_id'];
 
-    return {
-      data: '1',
-      message: '浏览成功',
-    };
+    // 使用事务处理浏览逻辑
+    return await this.manager.transaction(
+      async (transactionalEntityManager) => {
+        const userActivity = await transactionalEntityManager.findOne(
+          UserActivity,
+          {
+            where: {
+              user: { id: user_id },
+              activity: { id: activity_id },
+            },
+          },
+        );
+
+        if (!userActivity) {
+          // 首次浏览
+          await Promise.all([
+            transactionalEntityManager.save(UserActivity, {
+              user: { id: user_id },
+              activity: { id: activity_id },
+              isViewed: 1,
+            }),
+
+            transactionalEntityManager.update(Activity, activity_id, {
+              views: activity.views + 1,
+            }),
+          ]);
+        } else {
+          // 增加浏览次数
+          await Promise.all([
+            transactionalEntityManager.update(UserActivity, userActivity.id, {
+              isViewed: userActivity.isViewed,
+            }),
+            transactionalEntityManager.update(Activity, activity_id, {
+              views: activity.views + 1,
+            }),
+          ]);
+        }
+
+        return {
+          data: '1',
+          message: '浏览成功',
+        };
+      },
+    );
   }
 }
