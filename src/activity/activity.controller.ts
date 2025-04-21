@@ -64,6 +64,11 @@ export class ActivityController {
     return this.activityService.search(searchActivityDto);
   }
 
+  @Get('/searchKeyword/:keyword')
+  searchByKeyword(@Param('keyword') keyword: string) {
+    return this.activityService.searchByKeyword(keyword);
+  }
+
   @Get('status/:id')
   getStatus(@Param('id') id: string, @Req() request: Request) {
     return this.activityService.getStatus(+id, request);

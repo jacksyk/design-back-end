@@ -12,7 +12,7 @@ import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginGuard } from 'common/guard/login.guard';
-import { NotRequireLogin } from 'common/decorator';
+import { NotRequireLogin, RequireAdmin } from 'common/decorator';
 @UseGuards(LoginGuard)
 @Controller('user')
 export class UserController {
@@ -43,6 +43,26 @@ export class UserController {
   async update(@Body() updateUserDto: UpdateUserDto, @Req() request: Request) {
     const userId = request['user_id'];
     return this.userService.update(+userId, updateUserDto);
+  }
+
+  /** 删除某个用户 */
+  @RequireAdmin()
+  @Get('delete/:id')
+  remove(@Param('id') id: string) {
+    return this.userService.remove(+id);
+  }
+
+  /** 封禁某个用户 */
+  @RequireAdmin()
+  @Get('ban/:id')
+  ban(@Param('id') id: string) {
+    return this.userService.ban(+id);
+  }
+
+  /** 模糊搜索 */
+  @Get('search/:keyword')
+  search(@Param('keyword') keyword: string) {
+    return this.userService.search(keyword);
   }
 
   /** 点赞 */

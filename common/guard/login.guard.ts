@@ -2,6 +2,7 @@ import { JwtService } from '@nestjs/jwt';
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -12,10 +13,9 @@ import { RedisClientType } from 'redis';
 import { Reflector } from '@nestjs/core';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
-import { User } from '../../entities';
+import { User, UserRole } from '../../entities';
 
 @Injectable()
-
 /** 登录鉴权守卫 */
 export class LoginGuard implements CanActivate {
   @Inject(JwtService)
@@ -44,12 +44,26 @@ export class LoginGuard implements CanActivate {
     const token = request.header('token') ?? '';
 
     if (!token) {
-      throw new UnauthorizedException('未授权');
+      throw new UnauthorizedException('暂未授权');
     }
 
     const tokenInfo = this.jwtService.decode(token);
 
     const { id }: { id: number } = tokenInfo;
+
+    const userValue = await this.entityManager.findOne(User, {
+      where: {
+        id,
+      },
+    });
+
+    if (!userValue) {
+      throw new NotFoundException('用户不存在');
+    }
+
+    if (userValue.isActive === false) {
+      throw new ForbiddenException('用户被禁用');
+    }
 
     const requireAdmin = this.reflector.getAllAndOverride('require-admin', [
       context.getClass(),
@@ -61,17 +75,12 @@ export class LoginGuard implements CanActivate {
       const userValue = await this.entityManager.findOne(User, {
         where: {
           id,
+          role: UserRole.ADMIN,
         },
       });
 
       if (!userValue) {
-        throw new NotFoundException('用户不存在');
-      }
-
-      const { role = '' } = userValue;
-
-      if (role !== 'admin') {
-        throw new UnauthorizedException('权限不够');
+        throw new ForbiddenException('用户不存在或者权限不够');
       }
     }
 

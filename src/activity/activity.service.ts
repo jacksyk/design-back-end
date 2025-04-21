@@ -255,6 +255,21 @@ export class ActivityService {
     return data;
   }
 
+  async searchByKeyword(keyword: string) {
+    const data = await this.manager.find(Activity, {
+      where: [{ title: Like(`%${keyword}%`) }],
+      relations: ['user'],
+      order: {
+        created_at: 'DESC',
+      },
+    });
+
+    return {
+      data,
+      totalCount: data.length,
+    };
+  }
+
   async getStatus(activityId: number, @Req() request: Request) {
     const userId = request['user_id'];
 

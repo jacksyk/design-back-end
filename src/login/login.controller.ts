@@ -10,4 +10,9 @@ export class LoginController {
   login(@Body() loginDto: LoginDto) {
     return this.loginService.login(loginDto);
   }
+
+  @Post('/admin')
+  loginAdmin(@Body() loginDto: LoginDto) {
+    return this.loginService.loginAdmin(loginDto);
+  }
 }

@@ -3,6 +3,13 @@ import { Activity } from './activity.entity';
 import { UserActivity } from './user-activity.entity';
 import { Comment } from './comment.entity';
 import { FeedBack } from './feedback.entity';
+
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+  TEACHER = 'teacher',
+}
+
 @Entity({
   // 表名
   name: 'users',
@@ -48,12 +55,14 @@ export class User {
   /** 用户权限 */
   @Column({
     name: 'role',
-    length: 20,
+    // length: 20,
+    type: 'enum',
+    enum: UserRole,
     comment: '用户权限',
     nullable: true,
-    default: 'user',
+    default: UserRole.USER, // 默认为普通用户,
   })
-  role: string;
+  role: UserRole;
 
   /** 用户头像 */
   @Column({
@@ -90,6 +99,16 @@ export class User {
     nullable: true,
   })
   contact: string;
+
+  /** 账号是否能使用 */
+  @Column({
+    name: 'is_active',
+    type: 'boolean',
+    comment: '账号是否能使用',
+    nullable: true,
+    default: true,
+  })
+  isActive: boolean;
 
   /** 一对多 */
   @OneToMany(() => Activity, (activity) => activity.user)

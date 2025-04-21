@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
-import { Activity, User, UserActivity } from '../../entities';
+import { EntityManager, In, Like, Or } from 'typeorm'; // 添加 Like, Or 导入
+import { Activity, User, UserActivity, UserRole } from '../../entities';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RedisClientType } from 'redis';
 import { ActivityService } from 'src/activity/activity.service';
@@ -31,7 +31,11 @@ export class UserService {
   }
 
   async findAll() {
-    const [data, count] = await this.manager.findAndCount(User);
+    const [data, count] = await this.manager.findAndCount(User, {
+      where: {
+        role: In([UserRole.USER, UserRole.TEACHER]),
+      },
+    });
     return {
       data,
       totalCount: count,
@@ -116,9 +120,44 @@ export class UserService {
     return '更新成功';
   }
 
+  async ban(id: number) {
+    const originData = await this.manager.findOne(User, {
+      where: { id },
+    });
+    if (!originData) {
+      throw new NotFoundException('用户不存在');
+    }
+
+    await this.manager.update(User, id, {
+      ...originData,
+      isActive: !originData.isActive,
+    });
+  }
+
+  async search(keyword: string) {
+    const [data, count] = await this.manager.findAndCount(User, {
+      where: [
+        { username: Like(`%${keyword}%`) },
+        { student_id: Like(`%${keyword}%`) },
+        { email: Like(`%${keyword}%`) },
+        { college: Like(`%${keyword}%`) },
+        { contact: Like(`%${keyword}%`) },
+      ],
+      order: {
+        id: 'DESC',
+      },
+    });
+
+    return {
+      data,
+      totalCount: count,
+    };
+  }
+
   /** 删除用户 */
-  remove(id: number) {
-    return this.manager.delete(User, id);
+  async remove(id: number) {
+    await this.manager.delete(User, id);
+    return '删除成功';
   }
 
   async likes(activity_id: number, @Req() req: Request) {
