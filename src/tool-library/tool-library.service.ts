@@ -38,20 +38,32 @@ export class ToolLibraryService {
   }
 
   async deleteTag(tagId: number) {
-    const isExit = await this.entityManager.findOne(ToolLibraryTag, {
-      where: {
-        id: tagId,
+    // 开启事务
+    return await this.entityManager.transaction(
+      async (transactionalEntityManager) => {
+        const tag = await transactionalEntityManager.findOne(ToolLibraryTag, {
+          where: { id: tagId },
+          relations: ['tools'], // 加载关联的工具
+        });
+
+        if (!tag) {
+          throw new NotFoundException(`标签不存在`);
+        }
+
+        // 先删除中间表关联关系
+        await transactionalEntityManager
+          .createQueryBuilder()
+          .delete()
+          .from('tool_tags')
+          .where('tag_id = :tagId', { tagId })
+          .execute();
+
+        // 再删除标签
+        await transactionalEntityManager.delete(ToolLibraryTag, tagId);
+
+        return '删除成功';
       },
-    });
-    if (!isExit) {
-      throw new NotFoundException(`标签不存在`);
-    }
-
-    await this.entityManager.delete(ToolLibraryTag, {
-      id: tagId,
-    });
-
-    return '删除成功';
+    );
   }
 
   async createTool(createToolDto: CreateToolDto) {
@@ -79,19 +91,30 @@ export class ToolLibraryService {
   }
 
   async deleteTool(toolId: number) {
-    const isExit = await this.entityManager.findOne(ToolLibrary, {
-      where: {
-        id: toolId,
+    return await this.entityManager.transaction(
+      async (transactionalEntityManager) => {
+        const tool = await transactionalEntityManager.findOne(ToolLibrary, {
+          where: { id: toolId },
+          relations: ['tags'],
+        });
+
+        if (!tool) {
+          throw new NotFoundException(`工具不存在`);
+        }
+
+        // 先删除中间表关联关系
+        await transactionalEntityManager
+          .createQueryBuilder()
+          .delete()
+          .from('tool_tags')
+          .where('tool_id = :toolId', { toolId })
+          .execute();
+
+        // 再删除工具
+        await transactionalEntityManager.delete(ToolLibrary, toolId);
+
+        return '删除成功';
       },
-    });
-    if (!isExit) {
-      throw new NotFoundException(`工具不存在`);
-    }
-
-    await this.entityManager.delete(ToolLibrary, {
-      id: toolId,
-    });
-
-    return '删除成功';
+    );
   }
 }
