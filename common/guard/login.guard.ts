@@ -58,11 +58,11 @@ export class LoginGuard implements CanActivate {
     });
 
     if (!userValue) {
-      throw new NotFoundException('用户不存在');
+      throw new UnauthorizedException('用户不存在');
     }
 
     if (userValue.isActive === false) {
-      throw new ForbiddenException('用户被禁用');
+      throw new UnauthorizedException('用户被禁用');
     }
 
     const requireAdmin = this.reflector.getAllAndOverride('require-admin', [
@@ -80,7 +80,7 @@ export class LoginGuard implements CanActivate {
       });
 
       if (!userValue) {
-        throw new ForbiddenException('用户不存在或者权限不够');
+        throw new UnauthorizedException('用户不存在或者权限不够');
       }
     }
 
