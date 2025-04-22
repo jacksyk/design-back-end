@@ -7,6 +7,12 @@ import {
 } from 'typeorm';
 import { ToolLibraryTag } from './tool-library-tag.entity';
 
+// 添加类型枚举
+export enum ToolType {
+  LINK = 'link', // 链接类型
+  FILE = 'file', // 文件类型
+}
+
 @Entity({
   name: 'tool_library',
 })
@@ -29,11 +35,12 @@ export class ToolLibrary {
   description: string;
 
   @Column({
-    type: 'varchar',
-    length: 255,
-    comment: '图标',
+    type: 'enum',
+    enum: ToolType,
+    default: ToolType.LINK,
+    comment: '工具类型：链接或文件',
   })
-  icon: string;
+  type: ToolType;
 
   @ManyToMany(() => ToolLibraryTag, (tag) => tag.tools)
   @JoinTable({

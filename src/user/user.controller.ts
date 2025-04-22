@@ -59,6 +59,12 @@ export class UserController {
     return this.userService.ban(+id);
   }
 
+  /** 获取用户身份信息 */
+  @Get('/identity')
+  getIdentity(@Req() req: Request) {
+    return this.userService.getIdentity(req);
+  }
+
   /** 模糊搜索 */
   @Get('search/:keyword')
   search(@Param('keyword') keyword: string) {

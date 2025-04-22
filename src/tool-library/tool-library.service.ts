@@ -55,17 +55,17 @@ export class ToolLibraryService {
   }
 
   async createTool(createToolDto: CreateToolDto) {
-    const { tagIds, description, icon, link, title } = createToolDto;
+    const { tagIds, description, link, title, type } = createToolDto;
     const tags = await this.entityManager.findBy(ToolLibraryTag, {
       id: In(tagIds),
     });
 
     await this.entityManager.save(ToolLibrary, {
       description,
-      icon,
       link,
       title,
       tags,
+      type,
     });
 
     return '创建成功';

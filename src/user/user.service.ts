@@ -154,6 +154,14 @@ export class UserService {
     };
   }
 
+  async getIdentity(@Req() req: Request) {
+    const userId = req['user_id'];
+    const data = await this.manager.findOne(User, {
+      where: userId,
+    });
+    return data;
+  }
+
   /** 删除用户 */
   async remove(id: number) {
     await this.manager.delete(User, id);

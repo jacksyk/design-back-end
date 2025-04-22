@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsNumber,
 } from 'class-validator';
+import { ToolType } from '../../../entities';
 
 export class CreateToolDto {
   @IsNotEmpty({ message: '标题不能为空' })
@@ -16,10 +17,6 @@ export class CreateToolDto {
   @IsString()
   description: string;
 
-  @IsNotEmpty({ message: '图标不能为空' })
-  @IsString()
-  icon: string;
-
   @IsOptional()
   @IsArray()
   @IsNumber({}, { each: true, message: '标签ID必须是数字' })
@@ -28,4 +25,8 @@ export class CreateToolDto {
   @IsNotEmpty({ message: '链接不能为空' })
   @IsUrl({}, { message: '请输入有效的URL' })
   link: string;
+
+  @IsNotEmpty({ message: '文件类型不能为空' })
+  @IsString({ message: '文件类型必须是字符串' })
+  type: ToolType;
 }
