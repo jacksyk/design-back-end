@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -48,6 +49,10 @@ export class LoginGuard implements CanActivate {
     }
 
     const tokenInfo = this.jwtService.decode(token);
+
+    if (!tokenInfo) {
+      throw new UnauthorizedException('无效的token');
+    }
 
     const { id }: { id: number } = tokenInfo;
 
