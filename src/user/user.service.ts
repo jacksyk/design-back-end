@@ -73,23 +73,34 @@ export class UserService {
       relations: ['activities', 'comments', 'feedback'],
     });
 
-    const [, collectionCount] = await this.manager.findAndCount(UserActivity, {
-      where: {
-        user: {
-          id,
+    const [collectionDetail, collectionCount] = await this.manager.findAndCount(
+      UserActivity,
+      {
+        where: {
+          user: {
+            id,
+          },
+          isCollected: 1,
         },
-        isCollected: 1,
+        relations: ['activity'],
       },
-    });
+    );
 
-    const [, likesCount] = await this.manager.findAndCount(UserActivity, {
-      where: {
-        user: {
-          id,
+    const responseCollection = collectionDetail.map((item) => item.activity);
+
+    const [likesDetail, likesCount] = await this.manager.findAndCount(
+      UserActivity,
+      {
+        where: {
+          user: {
+            id,
+          },
+          isLiked: 1,
         },
-        isLiked: 1,
+        relations: ['activity'],
       },
-    });
+    );
+    const responseLikes = likesDetail.map((item) => item.activity);
 
     if (!data) {
       throw new BadRequestException('用户不存在');
@@ -99,6 +110,8 @@ export class UserService {
       ...data,
       collectionCount,
       likesCount,
+      likesDetail: responseLikes,
+      collectionDetail: responseCollection,
     };
   }
 
