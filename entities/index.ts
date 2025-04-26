@@ -8,3 +8,4 @@ export * from './resource-classify.entity';
 export * from './email.entity';
 export * from './tool-library.entity';
 export * from './tool-library-tag.entity';
+export * from './performance.entity';

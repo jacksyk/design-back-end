@@ -29,6 +29,8 @@ import { EmailModule } from './email/email.module';
 import { WebsocketModule } from './websocket/websocket.module';
 import { ToolLibraryModule } from './tool-library/tool-library.module';
 import { TranslateModule } from './translate/translate.module';
+import { PerformanceModule } from './performance/performance.module';
+import { Performance } from '../entities/performance.entity';
 
 @Module({
   imports: [
@@ -52,6 +54,7 @@ import { TranslateModule } from './translate/translate.module';
         Email,
         ToolLibrary,
         ToolLibraryTag,
+        Performance,
       ],
       synchronize: true,
     }),
@@ -77,6 +80,7 @@ import { TranslateModule } from './translate/translate.module';
     WebsocketModule,
     ToolLibraryModule,
     TranslateModule,
+    PerformanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
